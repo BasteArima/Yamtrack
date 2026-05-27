@@ -149,12 +149,14 @@ def media_list(request, username, media_type):
         )
     else:
         # Проверка публичности профиля через getattr для надежности
-        if not getattr(target_user, 'is_public', False):
-            raise Http404("User profile is private or not found.")
+        if not getattr(target_user, "is_public", False):
+            error_msg = "User profile is private or not found."
+            raise Http404(error_msg)
 
         enabled_media_types = target_user.get_enabled_media_types()
         if not enabled_media_types:
-            raise Http404("User doesn't have any media types enabled.")
+            error_msg = "User doesn't have any media types enabled."
+            raise Http404(error_msg)
 
         if media_type not in enabled_media_types:
             return redirect(
