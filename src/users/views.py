@@ -37,6 +37,12 @@ def account(request):
             user_form = UserUpdateForm(request.POST, instance=request.user)
 
             if user_form.is_valid():
+
+                if "profile_private" in request.POST:
+                    request.user.is_public = False
+                else:
+                    request.user.is_public = True
+
                 user_form.save()
                 messages.success(request, "Your profile has been updated!")
                 logger.info(
