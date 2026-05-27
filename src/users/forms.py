@@ -50,10 +50,10 @@ class UserUpdateForm(forms.ModelForm):
         """Add crispy form helper to add submit button."""
         super().__init__(*args, **kwargs)
         self.fields["username"].help_text = None
+        self.fields["is_public"].required = False
 
     class Meta:
-        """Only allow updating username."""
-
+        """Only allow updating username and visibility."""
         model = User
         fields = ["username", "is_public"]
 
