@@ -35,82 +35,105 @@ def _prefetch_custom_lists(queryset):
     )
 
 
-@login_not_required
-@require_GET
-def lists(request, username):
-    """Return the custom list page."""
-    target_user = get_object_or_404(User, username=username)
+def _get_custom_lists(request, target_user):
+    """Return (queryset, sort_by, is_owner) for the lists page."""
     is_owner = request.user.is_authenticated and request.user == target_user
-
-    if not is_owner:
-        if not target_user.is_public:
-            msg = "User not found"
-            raise Http404(msg)
-        custom_lists = _prefetch_custom_lists(
-            CustomList.objects.filter(owner=target_user, is_public=True),
-        )
-        sort_by = target_user.get_valid_preference(
-            "lists_sort",
-            request.GET.get("sort"),
-        )
-    else:
-        custom_lists = CustomList.objects.get_user_lists(target_user)
-        sort_by = request.user.update_preference(
-            "lists_sort",
-            request.GET.get("sort"),
-        )
-
-    search_query = request.GET.get("q", "")
-    page = request.GET.get("page", 1)
-
-    if search_query:
-        custom_lists = custom_lists.filter(
-            Q(name__icontains=search_query) | Q(description__icontains=search_query),
-        )
-
-    if sort_by == "name":
-        custom_lists = custom_lists.order_by("name")
-    elif sort_by == "items_count":
-        custom_lists = custom_lists.annotate(
-            items_count=Count("items", distinct=True),
-        ).order_by("-items_count")
-    elif sort_by == "newest_first":
-        custom_lists = custom_lists.order_by("-id")
-    else:  # last_item_added is the default
-        custom_lists = custom_lists.annotate(
-            latest_update=Subquery(
-                CustomListItem.objects.filter(
-                    custom_list=OuterRef("pk"),
-                )
-                .order_by("-date_added")
-                .values("date_added")[:1],
-            ),
-        ).order_by("-latest_update", "name")
-
-    items_per_page = 20
-    paginator = Paginator(custom_lists, items_per_page)
-    lists_page = paginator.get_page(page)
+    sort_param = request.GET.get("sort")
 
     if is_owner:
-        for i, custom_list in enumerate(lists_page, start=1):
-            if custom_list.user_can_edit(request.user):
-                custom_list.form = CustomListForm(
-                    instance=custom_list,
-                    auto_id=f"id_{i}_%s",
-                )
+        return (
+            CustomList.objects.get_user_lists(target_user),
+            request.user.update_preference("lists_sort", sort_param),
+            True,
+        )
 
-    context = {
+    if not target_user.is_public:
+        msg = "User not found"
+        raise Http404(msg)
+
+    return (
+        _prefetch_custom_lists(
+            CustomList.objects.filter(owner=target_user, is_public=True),
+        ),
+        target_user.get_valid_preference("lists_sort", sort_param),
+        False,
+    )
+
+
+def _apply_lists_search(custom_lists, search_query):
+    """Apply search filters for lists."""
+    if not search_query:
+        return custom_lists
+
+    return custom_lists.filter(
+        Q(name__icontains=search_query) | Q(description__icontains=search_query),
+    )
+
+
+def _apply_lists_sort(custom_lists, sort_by):
+    """Apply sorting for lists."""
+    if sort_by == "name":
+        return custom_lists.order_by("name")
+
+    if sort_by == "items_count":
+        return custom_lists.annotate(
+            items_count=Count("items", distinct=True),
+        ).order_by("-items_count")
+
+    if sort_by == "newest_first":
+        return custom_lists.order_by("-id")
+
+    # last_item_added is the default
+    return custom_lists.annotate(
+        latest_update=Subquery(
+            CustomListItem.objects.filter(
+                custom_list=OuterRef("pk"),
+            )
+            .order_by("-date_added")
+            .values("date_added")[:1],
+        ),
+    ).order_by("-latest_update", "name")
+
+
+def _attach_custom_list_forms(lists_page):
+    """Attach a CustomListForm instance to each list card (select2 needs stable ids)."""
+    for i, custom_list in enumerate(lists_page, start=1):
+        custom_list.form = CustomListForm(
+            instance=custom_list,
+            auto_id=f"id_{i}_%s",
+        )
+
+
+def _build_lists_context(lists_page, target_user, sort_by):
+    return {
         "custom_lists": lists_page,
         "target_user": target_user,
         "current_sort": sort_by,
         "sort_choices": ListSortChoices.choices,
     }
 
+
+@login_not_required
+@require_GET
+def lists(request, username):
+    """Return the custom list page."""
+    target_user = get_object_or_404(User, username=username)
+    custom_lists, sort_by, is_owner = _get_custom_lists(request, target_user)
+
+    custom_lists = _apply_lists_search(custom_lists, request.GET.get("q", ""))
+    custom_lists = _apply_lists_sort(custom_lists, sort_by)
+
+    page = request.GET.get("page", 1)
+    paginator = Paginator(custom_lists, 20)
+    lists_page = paginator.get_page(page)
+
+    context = _build_lists_context(lists_page, target_user, sort_by)
+    if is_owner:
+        _attach_custom_list_forms(lists_page)
+        context["form"] = CustomListForm()
+
     if request.headers.get("HX-Request"):
         return render(request, "lists/components/list_grid.html", context)
-
-    if is_owner:
-        context["form"] = CustomListForm()
 
     return render(request, "lists/custom_lists.html", context)
 

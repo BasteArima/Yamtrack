@@ -89,13 +89,17 @@ class ListsViewTests(TestCase):
         self.client.login(**self.credentials)
 
         # Test search by name
-        response = self.client.get(reverse("lists", args=[self.user.username]) + "?q=List 1")
+        response = self.client.get(
+            reverse("lists", args=[self.user.username]) + "?q=List 1"
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context["custom_lists"]), 1)
         self.assertEqual(response.context["custom_lists"][0].name, "Test List 1")
 
         # Test search by description
-        response = self.client.get(reverse("lists", args=[self.user.username]) + "?q=Description 2")
+        response = self.client.get(
+            reverse("lists", args=[self.user.username]) + "?q=Description 2"
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context["custom_lists"]), 1)
         self.assertEqual(response.context["custom_lists"][0].name, "Test List 2")
@@ -107,19 +111,25 @@ class ListsViewTests(TestCase):
 
         # Test name sorting
         mock_update_preference.return_value = "name"
-        response = self.client.get(reverse("lists", args=[self.user.username]) + "?sort=name")
+        response = self.client.get(
+            reverse("lists", args=[self.user.username]) + "?sort=name"
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_sort"], "name")
 
         # Test items_count sorting
         mock_update_preference.return_value = "items_count"
-        response = self.client.get(reverse("lists", args=[self.user.username]) + "?sort=items_count")
+        response = self.client.get(
+            reverse("lists", args=[self.user.username]) + "?sort=items_count"
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_sort"], "items_count")
 
         # Test newest_first sorting
         mock_update_preference.return_value = "newest_first"
-        response = self.client.get(reverse("lists", args=[self.user.username]) + "?sort=newest_first")
+        response = self.client.get(
+            reverse("lists", args=[self.user.username]) + "?sort=newest_first"
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_sort"], "newest_first")
 
@@ -136,7 +146,9 @@ class ListsViewTests(TestCase):
         self.client.login(**self.credentials)
 
         # Make an HTMX request
-        response = self.client.get(reverse("lists", args=[self.user.username]), headers={"hx-request": "true"})
+        response = self.client.get(
+            reverse("lists", args=[self.user.username]), headers={"hx-request": "true"}
+        )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lists/components/list_grid.html")
 
@@ -161,7 +173,9 @@ class ListsViewTests(TestCase):
         self.assertEqual(len(response.context["custom_lists"]), 20)  # 20 per page
 
         # Test second page
-        response = self.client.get(reverse("lists", args=[self.user.username]) + "?page=2")
+        response = self.client.get(
+            reverse("lists", args=[self.user.username]) + "?page=2"
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context["custom_lists"]), 7)  # 7 remaining items
 
@@ -285,7 +299,9 @@ class ListDetailViewTests(TestCase):
         )
 
         # Test the view
-        response = self.client.get(reverse("list_detail", args=[self.user.username, self.custom_list.id]))
+        response = self.client.get(
+            reverse("list_detail", args=[self.user.username, self.custom_list.id])
+        )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lists/list_detail.html")
 
@@ -423,7 +439,8 @@ class ListDetailViewTests(TestCase):
 
         # Test the view with search filter
         response = self.client.get(
-            reverse("list_detail", args=[self.user.username, self.custom_list.id]) + "?q=Anime",
+            reverse("list_detail", args=[self.user.username, self.custom_list.id])
+            + "?q=Anime",
         )
         self.assertEqual(response.status_code, 200)
 
@@ -437,7 +454,6 @@ class ListDetailViewTests(TestCase):
         mock_update_preference,
     ):
         """Test the list_detail view with different sorting options."""
-
         # Create model instances
         Movie.objects.create(
             item=self.movie_item,
@@ -460,7 +476,8 @@ class ListDetailViewTests(TestCase):
         # Test title sorting
         mock_update_preference.side_effect = ["title", None]
         response = self.client.get(
-            reverse("list_detail", args=[self.user.username, self.custom_list.id]) + "?sort=title",
+            reverse("list_detail", args=[self.user.username, self.custom_list.id])
+            + "?sort=title",
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_sort"], "title")
@@ -468,7 +485,8 @@ class ListDetailViewTests(TestCase):
         # Test media_type sorting
         mock_update_preference.side_effect = ["media_type", None]
         response = self.client.get(
-            reverse("list_detail", args=[self.user.username, self.custom_list.id]) + "?sort=media_type",
+            reverse("list_detail", args=[self.user.username, self.custom_list.id])
+            + "?sort=media_type",
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_sort"], "media_type")
@@ -530,7 +548,9 @@ class ListDetailViewTests(TestCase):
     def test_list_detail_wrong_username_returns_404(self):
         """List must be loaded under the owner's username in the URL."""
         response = self.client.get(
-            reverse("list_detail", args=[self.other_user.username, self.custom_list.id]),
+            reverse(
+                "list_detail", args=[self.other_user.username, self.custom_list.id]
+            ),
         )
         self.assertEqual(response.status_code, 404)
 
