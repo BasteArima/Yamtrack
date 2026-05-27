@@ -37,7 +37,7 @@
         </div>
 
         <div>
-          <label for="{{ user_form.is_public.id_for_label }}"
+          <label for="id_is_public"
                  class="block text-sm font-medium mb-2 text-gray-300">Profile visibility</label>
           <div class="flex items-center justify-between p-3 bg-[#39404b] rounded-md">
             <div class="flex-1">
@@ -47,13 +47,13 @@
               </div>
               <p class="text-xs text-gray-400 ml-7">Allow anyone to view your profile and media lists.</p>
             </div>
-            <label for="{{ user_form.is_public.id_for_label }}"
+            <label for="id_is_public"
                    class="relative inline-flex items-center cursor-pointer ml-4">
               <input type="checkbox"
-                     id="{{ user_form.is_public.id_for_label }}"
-                     name="{{ user_form.is_public.html_name }}"
+                     id="id_is_public"
+                     name="is_public"
                      class="sr-only peer"
-                     {% if user_form.is_public.value %}checked{% endif %}>
+                     {% if user.is_public %}checked{% endif %}>
               <div class="w-9 h-5 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-indigo-400 peer-focus:ring-offset-2 peer-focus:ring-offset-[#39404b] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-px after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-indigo-600">
               </div>
             </label>
