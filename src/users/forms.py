@@ -55,7 +55,7 @@ class UserUpdateForm(forms.ModelForm):
         """Only allow updating username."""
 
         model = User
-        fields = ["username", "profile_private"]
+        fields = ["username", "is_public"]
 
 
 class PasswordChangeForm(PasswordChangeForm):
