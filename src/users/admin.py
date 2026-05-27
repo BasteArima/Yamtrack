@@ -31,8 +31,8 @@ class CustomUserAdmin(UserAdmin):
             },
         ),
     )
-    list_display = ("username", "is_staff", "is_active", "is_demo", "last_login")
-    list_filter = ("is_staff", "is_active", "is_demo")
+    list_display = ("username", "is_staff", "is_active", "is_public", "is_demo", "last_login")
+    list_filter = ("is_staff", "is_active", "is_public", "is_demo")
 
     def get_fieldsets(self, _, obj=None):
         """Customize the fieldsets for the User model in the admin interface."""
