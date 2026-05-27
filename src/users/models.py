@@ -123,6 +123,11 @@ class User(AbstractUser):
         default=True, help_text="Toggle profile visibility to anonymous users"
     )
 
+    is_public = models.BooleanField(
+        default=True,
+        help_text="Allow anyone to view your profile and lists",
+    )
+
     last_search_type = models.CharField(
         max_length=10,
         default=MediaTypes.TV.value,

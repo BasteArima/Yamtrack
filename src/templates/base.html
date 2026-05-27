@@ -87,8 +87,9 @@
                   </a>
                 </li>
 
-                {% get_sidebar_media_types user as sidebar_media_types %}
-                {% for item in sidebar_media_types %}
+                {% if request.user.is_authenticated %}
+                  {% get_sidebar_media_types user as sidebar_media_types %}
+                  {% for item in sidebar_media_types %}
                   <li>
                     {% if target_user is None or target_user == request.user %}
                       <a href="{% url 'medialist' username=user.username media_type=item.media_type %}"
@@ -105,6 +106,7 @@
                     {% endif %}
                   </li>
                 {% endfor %}
+                {% endif %}
               </ul>
             {% endblock sidebar_own_media %}
 
@@ -144,7 +146,7 @@
                     </a>
                   </li>
 
-                  {% url 'lists' as lists_url %}
+                  {% url 'lists' request.user.username as lists_url %}
                   <li>
                     <a href="{{ lists_url }}"
                        class="flex items-center space-x-3 px-4 py-2 rounded-md transition-colors duration-200 text-sm {% if request.path == lists_url %}text-white bg-[#2c3136]{% else %}text-gray-400 hover:text-white hover:bg-[#23272b]{% endif %}">

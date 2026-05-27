@@ -67,7 +67,7 @@ class ListsViewTests(TestCase):
     def test_lists_owner_view(self):
         """Test the lists view response and context for owner."""
         self.client.login(**self.credentials)
-        response = self.client.get(reverse("lists"))
+        response = self.client.get(reverse("lists", args=[self.user.username]))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lists/custom_lists.html")
         self.assertIn("custom_lists", response.context)
@@ -76,7 +76,7 @@ class ListsViewTests(TestCase):
     def test_lists_collaborator_view(self):
         """Test the lists view response and context for a collaborator."""
         self.client.login(**self.collaborator_credentials)
-        response = self.client.get(reverse("lists"))
+        response = self.client.get(reverse("lists", args=[self.collaborator.username]))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lists/custom_lists.html")
         self.assertIn("custom_lists", response.context)
@@ -89,13 +89,13 @@ class ListsViewTests(TestCase):
         self.client.login(**self.credentials)
 
         # Test search by name
-        response = self.client.get(reverse("lists") + "?q=List 1")
+        response = self.client.get(reverse("lists", args=[self.user.username]) + "?q=List 1")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context["custom_lists"]), 1)
         self.assertEqual(response.context["custom_lists"][0].name, "Test List 1")
 
         # Test search by description
-        response = self.client.get(reverse("lists") + "?q=Description 2")
+        response = self.client.get(reverse("lists", args=[self.user.username]) + "?q=Description 2")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context["custom_lists"]), 1)
         self.assertEqual(response.context["custom_lists"][0].name, "Test List 2")
@@ -107,25 +107,25 @@ class ListsViewTests(TestCase):
 
         # Test name sorting
         mock_update_preference.return_value = "name"
-        response = self.client.get(reverse("lists") + "?sort=name")
+        response = self.client.get(reverse("lists", args=[self.user.username]) + "?sort=name")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_sort"], "name")
 
         # Test items_count sorting
         mock_update_preference.return_value = "items_count"
-        response = self.client.get(reverse("lists") + "?sort=items_count")
+        response = self.client.get(reverse("lists", args=[self.user.username]) + "?sort=items_count")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_sort"], "items_count")
 
         # Test newest_first sorting
         mock_update_preference.return_value = "newest_first"
-        response = self.client.get(reverse("lists") + "?sort=newest_first")
+        response = self.client.get(reverse("lists", args=[self.user.username]) + "?sort=newest_first")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_sort"], "newest_first")
 
         # Test default sorting (last_item_added)
         mock_update_preference.return_value = "last_item_added"
-        response = self.client.get(reverse("lists"))
+        response = self.client.get(reverse("lists", args=[self.user.username]))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_sort"], "last_item_added")
 
@@ -136,7 +136,7 @@ class ListsViewTests(TestCase):
         self.client.login(**self.credentials)
 
         # Make an HTMX request
-        response = self.client.get(reverse("lists"), headers={"hx-request": "true"})
+        response = self.client.get(reverse("lists", args=[self.user.username]), headers={"hx-request": "true"})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lists/components/list_grid.html")
 
@@ -156,14 +156,44 @@ class ListsViewTests(TestCase):
             )
 
         # Test first page
-        response = self.client.get(reverse("lists"))
+        response = self.client.get(reverse("lists", args=[self.user.username]))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context["custom_lists"]), 20)  # 20 per page
 
         # Test second page
-        response = self.client.get(reverse("lists") + "?page=2")
+        response = self.client.get(reverse("lists", args=[self.user.username]) + "?page=2")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context["custom_lists"]), 7)  # 7 remaining items
+
+    def test_guest_can_view_public_user_lists(self):
+        """Anonymous users can view lists of users with is_public=True."""
+        self.client.logout()
+        response = self.client.get(reverse("lists", args=[self.user.username]))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("target_user", response.context)
+
+    def test_guest_cannot_view_private_profile_lists(self):
+        """Anonymous users get 404 when target user has is_public=False."""
+        self.user.is_public = False
+        self.user.save(update_fields=["is_public"])
+        self.client.logout()
+        response = self.client.get(reverse("lists", args=[self.user.username]))
+        self.assertEqual(response.status_code, 404)
+
+    def test_other_user_sees_only_public_lists(self):
+        """Another user only sees public lists of a public profile."""
+        CustomList.objects.create(
+            name="Private List",
+            owner=self.user,
+            is_public=False,
+        )
+        self.client.logout()
+        self.client.login(**self.collaborator_credentials)
+        response = self.client.get(reverse("lists", args=[self.user.username]))
+        self.assertEqual(response.status_code, 200)
+        names = [cl.name for cl in response.context["custom_lists"]]
+        self.assertNotIn("Private List", names)
+        self.assertIn("Test List 1", names)
 
 
 class ListDetailViewTests(TestCase):
@@ -226,15 +256,12 @@ class ListDetailViewTests(TestCase):
         )
 
     @patch.object(get_user_model(), "update_preference")
-    @patch.object(CustomList, "user_can_view")
     def test_list_detail_view(
         self,
-        mock_user_can_view,
         mock_update_preference,
     ):
         """Test the list_detail view."""
         mock_update_preference.side_effect = ["date_added", None]
-        mock_user_can_view.return_value = True
 
         # Create Movie instance
         Movie.objects.create(
@@ -258,7 +285,7 @@ class ListDetailViewTests(TestCase):
         )
 
         # Test the view
-        response = self.client.get(reverse("list_detail", args=[self.custom_list.id]))
+        response = self.client.get(reverse("list_detail", args=[self.user.username, self.custom_list.id]))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lists/list_detail.html")
 
@@ -268,30 +295,25 @@ class ListDetailViewTests(TestCase):
         self.assertEqual(response.context["current_sort"], "date_added")
         self.assertEqual(response.context["items_count"], 3)
 
-    @patch.object(get_user_model(), "update_preference")
-    @patch.object(CustomList, "user_can_view")
-    def test_list_detail_view_unauthorized(
-        self,
-        mock_user_can_view,
-        mock_update_preference,
-    ):
+    def test_list_detail_view_unauthorized(self):
         """Test the list_detail view when user is not authorized."""
-        mock_update_preference.side_effect = ["date_added", None]
-        mock_user_can_view.return_value = False
+        self.custom_list.is_public = False
+        self.custom_list.save(update_fields=["is_public"])
+        self.client.logout()
+        self.client.login(**self.other_credentials)
 
-        response = self.client.get(reverse("list_detail", args=[self.custom_list.id]))
+        response = self.client.get(
+            reverse("list_detail", args=[self.user.username, self.custom_list.id]),
+        )
         self.assertEqual(response.status_code, 404)
 
     @patch.object(get_user_model(), "update_preference")
-    @patch.object(CustomList, "user_can_view")
     def test_list_detail_view_filter_by_media_type(
         self,
-        mock_user_can_view,
         mock_update_preference,
     ):
         """Test the list_detail view with media type filter."""
         mock_update_preference.side_effect = ["date_added", None]
-        mock_user_can_view.return_value = True
 
         # Create model instances
         Movie.objects.create(
@@ -314,7 +336,7 @@ class ListDetailViewTests(TestCase):
 
         # Test the view with media type filter
         response = self.client.get(
-            reverse("list_detail", args=[self.custom_list.id])
+            reverse("list_detail", args=[self.user.username, self.custom_list.id])
             + f"?type={MediaTypes.MOVIE.value}",
         )
         self.assertEqual(response.status_code, 200)
@@ -327,15 +349,12 @@ class ListDetailViewTests(TestCase):
         )
 
     @patch.object(get_user_model(), "update_preference")
-    @patch.object(CustomList, "user_can_view")
     def test_list_detail_view_filter_by_status(
         self,
-        mock_user_can_view,
         mock_update_preference,
     ):
         """Test the list_detail view with status filter."""
         mock_update_preference.side_effect = ["date_added", Status.PLANNING.value]
-        mock_user_can_view.return_value = True
 
         # Create model instances
         Movie.objects.create(
@@ -358,7 +377,7 @@ class ListDetailViewTests(TestCase):
 
         # Test the view with status filter
         response = self.client.get(
-            reverse("list_detail", args=[self.custom_list.id])
+            reverse("list_detail", args=[self.user.username, self.custom_list.id])
             + f"?status={Status.PLANNING.value}",
         )
         self.assertEqual(response.status_code, 200)
@@ -376,15 +395,12 @@ class ListDetailViewTests(TestCase):
         )
 
     @patch.object(get_user_model(), "update_preference")
-    @patch.object(CustomList, "user_can_view")
     def test_list_detail_view_search(
         self,
-        mock_user_can_view,
         mock_update_preference,
     ):
         """Test the list_detail view with search filter."""
         mock_update_preference.side_effect = ["date_added", None]
-        mock_user_can_view.return_value = True
 
         # Create model instances
         Movie.objects.create(
@@ -407,7 +423,7 @@ class ListDetailViewTests(TestCase):
 
         # Test the view with search filter
         response = self.client.get(
-            reverse("list_detail", args=[self.custom_list.id]) + "?q=Anime",
+            reverse("list_detail", args=[self.user.username, self.custom_list.id]) + "?q=Anime",
         )
         self.assertEqual(response.status_code, 200)
 
@@ -416,14 +432,11 @@ class ListDetailViewTests(TestCase):
         self.assertEqual(response.context["items"][0].title, "Test Anime")
 
     @patch.object(get_user_model(), "update_preference")
-    @patch.object(CustomList, "user_can_view")
     def test_list_detail_view_sorting(
         self,
-        mock_user_can_view,
         mock_update_preference,
     ):
         """Test the list_detail view with different sorting options."""
-        mock_user_can_view.return_value = True
 
         # Create model instances
         Movie.objects.create(
@@ -447,7 +460,7 @@ class ListDetailViewTests(TestCase):
         # Test title sorting
         mock_update_preference.side_effect = ["title", None]
         response = self.client.get(
-            reverse("list_detail", args=[self.custom_list.id]) + "?sort=title",
+            reverse("list_detail", args=[self.user.username, self.custom_list.id]) + "?sort=title",
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_sort"], "title")
@@ -455,21 +468,18 @@ class ListDetailViewTests(TestCase):
         # Test media_type sorting
         mock_update_preference.side_effect = ["media_type", None]
         response = self.client.get(
-            reverse("list_detail", args=[self.custom_list.id]) + "?sort=media_type",
+            reverse("list_detail", args=[self.user.username, self.custom_list.id]) + "?sort=media_type",
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_sort"], "media_type")
 
     @patch.object(get_user_model(), "update_preference")
-    @patch.object(CustomList, "user_can_view")
     def test_list_detail_view_htmx_request(
         self,
-        mock_user_can_view,
         mock_update_preference,
     ):
         """Test the list_detail view with HTMX request."""
         mock_update_preference.side_effect = ["date_added", None]
-        mock_user_can_view.return_value = True
 
         # Create model instances
         Movie.objects.create(
@@ -492,12 +502,37 @@ class ListDetailViewTests(TestCase):
 
         # Make an HTMX request
         response = self.client.get(
-            reverse("list_detail", args=[self.custom_list.id]),
+            reverse("list_detail", args=[self.user.username, self.custom_list.id]),
             headers={"hx-request": "true"},
         )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lists/components/media_grid.html")
         self.assertNotIn("form", response.context)
+
+    def test_guest_can_view_public_list_detail(self):
+        """Anonymous users can view a public list detail page."""
+        self.client.logout()
+        response = self.client.get(
+            reverse("list_detail", args=[self.user.username, self.custom_list.id]),
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_guest_private_list_detail_returns_404(self):
+        """Anonymous users cannot view a private list."""
+        self.custom_list.is_public = False
+        self.custom_list.save(update_fields=["is_public"])
+        self.client.logout()
+        response = self.client.get(
+            reverse("list_detail", args=[self.user.username, self.custom_list.id]),
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_list_detail_wrong_username_returns_404(self):
+        """List must be loaded under the owner's username in the URL."""
+        response = self.client.get(
+            reverse("list_detail", args=[self.other_user.username, self.custom_list.id]),
+        )
+        self.assertEqual(response.status_code, 404)
 
 
 class CreateListViewTest(TestCase):
@@ -595,8 +630,16 @@ class DeleteListViewTest(TestCase):
     def test_delete_list(self):
         """Test deleting a list."""
         self.client.login(**self.credentials)
-        self.client.post(reverse("list_delete"), {"list_id": self.list.id})
+        response = self.client.post(
+            reverse("list_delete"),
+            {"list_id": self.list.id},
+            follow=True,
+        )
         self.assertEqual(CustomList.objects.count(), 0)
+        self.assertRedirects(
+            response,
+            reverse("lists", args=[self.user.username]),
+        )
 
     def test_delete_list_collaborator(self):
         """Test deleting a list as a collaborator."""

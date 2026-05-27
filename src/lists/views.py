@@ -1,8 +1,10 @@
 import logging
 
 from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_not_required, login_required
 from django.core.paginator import Paginator
-from django.db.models import Count, F, OuterRef, Q, Subquery
+from django.db.models import Count, F, OuterRef, Prefetch, Q, Subquery
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_POST
@@ -15,17 +17,51 @@ from lists.models import CustomList, CustomListItem
 from users.models import ListDetailSortChoices, ListSortChoices, MediaStatusChoices
 
 logger = logging.getLogger(__name__)
+User = get_user_model()
 
 
+def _prefetch_custom_lists(queryset):
+    """Apply standard prefetching for custom list querysets."""
+    return queryset.select_related("owner").prefetch_related(
+        "collaborators",
+        Prefetch(
+            "items",
+            queryset=Item.objects.order_by("-customlistitem__date_added"),
+        ),
+        Prefetch(
+            "customlistitem_set",
+            queryset=CustomListItem.objects.order_by("-date_added"),
+        ),
+    )
+
+
+@login_not_required
 @require_GET
-def lists(request):
+def lists(request, username):
     """Return the custom list page."""
-    # Get parameters from request
+    target_user = get_object_or_404(User, username=username)
+    is_owner = request.user.is_authenticated and request.user == target_user
+
+    if not is_owner:
+        if not target_user.is_public:
+            msg = "User not found"
+            raise Http404(msg)
+        custom_lists = _prefetch_custom_lists(
+            CustomList.objects.filter(owner=target_user, is_public=True),
+        )
+        sort_by = target_user.get_valid_preference(
+            "lists_sort",
+            request.GET.get("sort"),
+        )
+    else:
+        custom_lists = CustomList.objects.get_user_lists(target_user)
+        sort_by = request.user.update_preference(
+            "lists_sort",
+            request.GET.get("sort"),
+        )
+
     search_query = request.GET.get("q", "")
     page = request.GET.get("page", 1)
-    sort_by = request.user.update_preference("lists_sort", request.GET.get("sort"))
-
-    custom_lists = CustomList.objects.get_user_lists(request.user)
 
     if search_query:
         custom_lists = custom_lists.filter(
@@ -41,7 +77,6 @@ def lists(request):
     elif sort_by == "newest_first":
         custom_lists = custom_lists.order_by("-id")
     else:  # last_item_added is the default
-        # Get the latest update date for each list
         custom_lists = custom_lists.annotate(
             latest_update=Subquery(
                 CustomListItem.objects.filter(
@@ -56,89 +91,95 @@ def lists(request):
     paginator = Paginator(custom_lists, items_per_page)
     lists_page = paginator.get_page(page)
 
-    # Create a form for each list
-    # needs unique id for django-select2
-    for i, custom_list in enumerate(lists_page, start=1):
-        custom_list.form = CustomListForm(
-            instance=custom_list,
-            auto_id=f"id_{i}_%s",
-        )
+    if is_owner:
+        for i, custom_list in enumerate(lists_page, start=1):
+            if custom_list.user_can_edit(request.user):
+                custom_list.form = CustomListForm(
+                    instance=custom_list,
+                    auto_id=f"id_{i}_%s",
+                )
+
+    context = {
+        "custom_lists": lists_page,
+        "target_user": target_user,
+        "current_sort": sort_by,
+        "sort_choices": ListSortChoices.choices,
+    }
 
     if request.headers.get("HX-Request"):
-        return render(
-            request,
-            "lists/components/list_grid.html",
-            {
-                "custom_lists": lists_page,
-            },
-        )
+        return render(request, "lists/components/list_grid.html", context)
 
-    create_list_form = CustomListForm()
+    if is_owner:
+        context["form"] = CustomListForm()
 
-    return render(
-        request,
-        "lists/custom_lists.html",
-        {
-            "custom_lists": lists_page,
-            "form": create_list_form,
-            "current_sort": sort_by,
-            "sort_choices": ListSortChoices.choices,
-        },
-    )
+    return render(request, "lists/custom_lists.html", context)
 
 
+@login_not_required
 @require_GET
-def list_detail(request, list_id):
+def list_detail(request, username, list_id):
     """Return the detail page of a custom list."""
+    target_user = get_object_or_404(User, username=username)
     custom_list = get_object_or_404(
         CustomList.objects.select_related("owner").prefetch_related("collaborators"),
         id=list_id,
+        owner=target_user,
     )
 
-    if not custom_list.user_can_view(request.user):
+    is_owner = request.user.is_authenticated and request.user == target_user
+    can_view = custom_list.user_can_view(request.user) or custom_list.is_public
+    if not can_view:
         msg = "List not found"
         raise Http404(msg)
 
-    # Get and process request parameters
-    params = {
-        "sort_by": request.user.update_preference(
+    media_user = target_user
+    if is_owner:
+        sort_by = request.user.update_preference(
             "list_detail_sort",
             request.GET.get("sort"),
-        ),
-        "media_type": request.GET.get("type", "all"),
-        "status_filter": request.user.update_preference(
+        )
+        status_filter = request.user.update_preference(
             "list_detail_status",
             request.GET.get("status"),
-        ),
+        )
+    else:
+        sort_by = target_user.get_valid_preference(
+            "list_detail_sort",
+            request.GET.get("sort"),
+        )
+        status_filter = target_user.get_valid_preference(
+            "list_detail_status",
+            request.GET.get("status"),
+        )
+
+    params = {
+        "sort_by": sort_by,
+        "media_type": request.GET.get("type", "all"),
+        "status_filter": status_filter,
         "page": int(request.GET.get("page", 1)),
         "search_query": request.GET.get("q", ""),
     }
 
-    # Build and filter base queryset
     items = custom_list.items.all()
     if params["search_query"]:
         items = items.filter(title__icontains=params["search_query"])
     if params["media_type"] != "all":
         items = items.filter(media_type=params["media_type"])
 
-    # Get distinct media types for filtering
     media_types = items.values_list("media_type", flat=True).distinct()
     media_manager = MediaManager()
     media_by_item_id = {}
 
-    # Filter by status if specified
     if params["status_filter"] != MediaStatusChoices.ALL:
         item_ids = items.values_list("id", flat=True)
         media_by_item_id = media_manager.fetch_media_for_items(
             media_types,
             item_ids,
-            request.user,
+            media_user,
             status_filter=params["status_filter"],
         )
-        # Filter items to only those with the specified status
         items = items.filter(id__in=media_by_item_id.keys())
 
-    # Apply sorting
     sort_mapping = {
         "date_added": ["-customlistitem__date_added"],
         "title": [
@@ -152,27 +193,24 @@ def list_detail(request, list_id):
         *sort_mapping.get(params["sort_by"], ["-customlistitem__date_added"]),
     )
 
-    # Paginate
     paginator = Paginator(items, 16)
     items_page = paginator.get_page(params["page"])
 
-    # If no status filter was applied, fetch media objects for paginated items only
     if params["status_filter"] == MediaStatusChoices.ALL:
         media_types_in_page = {item.media_type for item in items_page}
         page_item_ids = [item.id for item in items_page]
         media_by_item_id = media_manager.fetch_media_for_items(
             media_types_in_page,
             page_item_ids,
-            request.user,
+            media_user,
         )
 
-    # Annotate items with media objects
     for item in items_page:
         item.media = media_by_item_id.get(item.id)
 
-    # Base context for both full and partial responses
     context = {
         "custom_list": custom_list,
+        "target_user": target_user,
         "items": items_page,
         "has_next": items_page.has_next(),
         "next_page_number": items_page.next_page_number()
@@ -184,11 +222,11 @@ def list_detail(request, list_id):
         "status_choices": MediaStatusChoices.choices,
     }
 
-    # Additional context for full page render
     if not request.headers.get("HX-Request"):
+        if custom_list.user_can_edit(request.user):
+            context["form"] = CustomListForm(instance=custom_list)
         context.update(
             {
-                "form": CustomListForm(instance=custom_list),
                 "media_types": MediaTypes.values,
                 "items_count": paginator.count,
                 "collaborators_count": custom_list.collaborators.count() + 1,
@@ -196,10 +234,10 @@ def list_detail(request, list_id):
         )
         return render(request, "lists/list_detail.html", context)
 
-    # HTMX partial response
     return render(request, "lists/components/media_grid.html", context)
 
 
+@login_required
 @require_POST
 def create(request):
     """Create a new custom list."""
@@ -216,6 +254,7 @@ def create(request):
     return helpers.redirect_back(request)
 
 
+@login_required
 @require_POST
 def edit(request):
     """Edit an existing custom list."""
@@ -231,6 +270,7 @@ def edit(request):
     return helpers.redirect_back(request)
 
 
+@login_required
 @require_POST
 def delete(request):
     """Delete a custom list."""
@@ -239,7 +279,7 @@ def delete(request):
     if custom_list.user_can_delete(request.user):
         custom_list.delete()
         logger.info("%s list deleted successfully.", custom_list)
-        return redirect("lists")
+        return redirect("lists", username=request.user.username)
 
     messages.error(request, "You do not have permission to delete this list.")
     return helpers.redirect_back(request)
@@ -290,6 +330,7 @@ def lists_modal(
     )
 
 
+@login_required
 @require_POST
 def list_item_toggle(request):
     """Add or remove an item from a custom list."""
@@ -301,7 +342,7 @@ def list_item_toggle(request):
         CustomList.objects.filter(
             Q(owner=request.user) | Q(collaborators=request.user),
             id=custom_list_id,
-        ).distinct(),  # To prevent duplicates, when user is owner and collaborator
+        ).distinct(),
     )
 
     if custom_list.items.filter(id=item.id).exists():
