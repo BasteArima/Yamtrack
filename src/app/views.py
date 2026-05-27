@@ -128,10 +128,13 @@ def progress_edit(request, media_type, instance_id):
 @require_GET
 def media_list(request, username, media_type):
     """Return the media list page."""
-    target_user = get_object_or_404(User, username=username)
+    # 1. Ищем пользователя без учета регистра (Heather == heather)
+    target_user = get_object_or_404(User, username__iexact=username)
 
-    # if user is looking at own page then update preferences
-    if request.user == target_user:
+    # 2. Безопасная проверка владельца (учитывает гостей/AnonymousUser)
+    is_owner = request.user.is_authenticated and request.user == target_user
+
+    if is_owner:
         layout = target_user.update_preference(
             f"{media_type}_layout",
             request.GET.get("layout"),
@@ -145,15 +148,13 @@ def media_list(request, username, media_type):
             request.GET.get("status"),
         )
     else:
-        # privacy check then media type check
-        if not target_user.is_public:
-            msg = "User not found"
-            raise Http404(msg)
+        # Проверка публичности профиля через getattr для надежности
+        if not getattr(target_user, 'is_public', False):
+            raise Http404("User profile is private or not found.")
 
         enabled_media_types = target_user.get_enabled_media_types()
         if not enabled_media_types:
-            msg = "User doesn't have any media types enabled"
-            raise Http404(msg)
+            raise Http404("User doesn't have any media types enabled.")
 
         if media_type not in enabled_media_types:
             return redirect(
@@ -178,11 +179,9 @@ def media_list(request, username, media_type):
     search_query = request.GET.get("search", "")
     page = request.GET.get("page", 1)
 
-    # Prepare status filter for database query
     if not status_filter:
         status_filter = MediaStatusChoices.ALL
 
-    # Get media list with filters applied
     media_queryset = BasicMedia.objects.get_media_list(
         user=target_user,
         media_type=media_type,
@@ -191,7 +190,6 @@ def media_list(request, username, media_type):
         search=search_query,
     )
 
-    # Paginate results
     items_per_page = 32
     paginator = Paginator(media_queryset, items_per_page)
     media_page = paginator.get_page(page)
@@ -212,13 +210,11 @@ def media_list(request, username, media_type):
         "sort_choices": MediaSortChoices.choices,
         "status_choices": MediaStatusChoices.choices,
         "target_user": target_user,
+        "is_owner": is_owner,  # Передаем флаг в шаблон, чтобы скрыть кнопки от гостей
     }
 
-    # Handle HTMX requests for partial updates
     if request.headers.get("HX-Request"):
-        # Filtering from empty list
         if request.headers.get("HX-Target") == "empty_list":
-            # If still empty, keep user in the same page
             if not media_page.object_list:
                 return HttpResponse(status=204)
             response = HttpResponse()
