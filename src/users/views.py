@@ -33,17 +33,20 @@ def account(request):
 
     if request.method == "POST":
         # Handle username update
+        # Handle username and profile visibility update
         if "username" in request.POST:
             user_form = UserUpdateForm(request.POST, instance=request.user)
 
             if user_form.is_valid():
+                # Берем данные из формы, но пока не сохраняем в БД
+                user = user_form.save(commit=False)
 
-                if "profile_private" in request.POST:
-                    request.user.is_public = False
-                else:
-                    request.user.is_public = True
+                # Жестко читаем чекбокс из сырого запроса браузера
+                user.is_public = request.POST.get("is_public") == "on"
 
-                user_form.save()
+                # Сохраняем всё вместе в базу одним ударом
+                user.save()
+
                 messages.success(request, "Your profile has been updated!")
                 logger.info(
                     "Successful profile change for user: %s",
