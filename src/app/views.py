@@ -146,7 +146,7 @@ def media_list(request, username, media_type):
         )
     else:
         # privacy check then media type check
-        if target_user.profile_private:
+        if not target_user.is_public:
             msg = "User not found"
             raise Http404(msg)
 

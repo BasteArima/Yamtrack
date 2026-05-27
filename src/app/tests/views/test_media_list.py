@@ -22,7 +22,7 @@ class MediaListViewTests(TestCase):
         self.external_credentials = {
             "username": "test2",
             "password": "12345",
-            "profile_private": True,
+            "is_public": False,
         }
         self.user = get_user_model().objects.create_user(**self.credentials)
         self.external_user = get_user_model().objects.create_user(
@@ -116,8 +116,8 @@ class MediaListViewTests(TestCase):
 
     def test_public_media_list_ignores_invalid_filters(self):
         """Test invalid public filters fall back to the target user's preferences."""
-        self.external_user.profile_private = False
-        self.external_user.save(update_fields=["profile_private"])
+        self.external_user.is_public = True
+        self.external_user.save(update_fields=["is_public"])
 
         response = self.client.get(
             reverse(
@@ -139,8 +139,8 @@ class MediaListViewTests(TestCase):
 
     def test_anonymous_user_can_view_public_media_list(self):
         """Test anonymous users can view public media lists."""
-        self.external_user.profile_private = False
-        self.external_user.save(update_fields=["profile_private"])
+        self.external_user.is_public = True
+        self.external_user.save(update_fields=["is_public"])
         self.client.logout()
 
         response = self.client.get(
@@ -152,13 +152,13 @@ class MediaListViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("media_list", response.context)
 
-    def test_profile_private_defaults_to_true(self):
-        """Test new users have private profiles by default."""
+    def test_is_public_defaults_to_true(self):
+        """Test new users have public profiles by default."""
         user = get_user_model().objects.create_user(
             username="private-default",
         )
 
-        self.assertTrue(user.profile_private)
+        self.assertTrue(user.is_public)
 
     def test_private_media_list(self):
         """Test the private media list view."""
@@ -176,6 +176,9 @@ class MediaListViewTests(TestCase):
         self.assertTrue(form.is_valid(), form.errors)
         external_user = form.save()
         external_user.refresh_from_db()
+
+        external_user.is_public = True
+        external_user.save(update_fields=["is_public"])
 
         response = self.client.get(
             reverse(
