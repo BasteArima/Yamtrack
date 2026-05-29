@@ -38,13 +38,10 @@ def account(request):
             user_form = UserUpdateForm(request.POST, instance=request.user)
 
             if user_form.is_valid():
-                # Берем данные из формы, но пока не сохраняем в БД
                 user = user_form.save(commit=False)
 
-                # Жестко читаем чекбокс из сырого запроса браузера
                 user.is_public = request.POST.get("is_public") == "on"
 
-                # Сохраняем всё вместе в базу одним ударом
                 user.save()
 
                 messages.success(request, "Your profile has been updated!")

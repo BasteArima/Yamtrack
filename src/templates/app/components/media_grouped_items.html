@@ -1,0 +1,48 @@
+{% regroup media_list by get_status_display as status_groups %}
+<div class="space-y-8 w-full">
+  {% for group in status_groups %}
+    <div x-data="{ expanded: true }" class="bg-[#2a2f35] rounded-lg p-5 border border-[#39404b]">
+      <button @click="expanded = !expanded" class="w-full flex justify-between items-center mb-4 cursor-pointer">
+        <h2 class="text-xl font-bold flex items-center gap-3 text-white">
+          {{ group.grouper }}
+          <span class="text-sm font-normal text-gray-400 bg-[#39404b] px-2 py-0.5 rounded-full">
+            {{ group.list|length }}
+          </span>
+        </h2>
+        <svg class="w-5 h-5 text-gray-400 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"></path></svg>
+      </button>
+
+      <div x-show="expanded">
+        {% if current_layout == 'grid' %}
+          <div class="media-grid">
+            {% with media_list=group.list %}
+              {% include "app/components/media_grid_items.html" %}
+            {% endwith %}
+          </div>
+        {% else %}
+          <div class="overflow-x-scroll max-w-[calc(100svw-4rem)]">
+            <table class="w-full bg-[#2a2f35]">
+              <thead class="text-left text-gray-400 text-sm border-b border-gray-700">
+                <tr>
+                  <th class="p-2 w-15"></th>
+                  <th class="p-2 pe-8 w-2/5">Title</th>
+                  <th class="p-2 text-center">Score</th>
+                  {% if media_type != 'movie' %}<th class="p-2 text-center">Progress</th>{% endif %}
+                  {% if media_type == 'tv' %}<th class="p-2 text-center">Last Watched</th>{% endif %}
+                  <th class="p-2 text-center">Status</th>
+                  <th class="p-2 text-center">Start Date</th>
+                  <th class="p-2 text-center">End Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% with media_list=group.list %}
+                  {% include "app/components/media_table_items.html" %}
+                {% endwith %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+</div>

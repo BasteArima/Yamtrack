@@ -302,6 +302,17 @@ class User(AbstractUser):
         choices=MediaStatusChoices,
     )
 
+    # Grouping preferences
+    tv_grouped = models.BooleanField(default=True)
+    season_grouped = models.BooleanField(default=True)
+    movie_grouped = models.BooleanField(default=True)
+    anime_grouped = models.BooleanField(default=True)
+    manga_grouped = models.BooleanField(default=True)
+    game_grouped = models.BooleanField(default=True)
+    book_grouped = models.BooleanField(default=True)
+    comic_grouped = models.BooleanField(default=True)
+    boardgame_grouped = models.BooleanField(default=True)
+
     # UI preferences
     clickable_media_cards = models.BooleanField(
         default=False,
