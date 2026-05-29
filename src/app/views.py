@@ -128,37 +128,55 @@ def progress_edit(request, media_type, instance_id):
 @require_GET
 def media_list(request, username, media_type):
     """Return the media list page."""
-    # 1. Ищем пользователя без учета регистра
+    # 1. Ищем пользователя без учета регистра (Heather == heather)
     target_user = get_object_or_404(User, username__iexact=username)
+
+    # 2. Безопасная проверка владельца (учитывает гостей/AnonymousUser)
     is_owner = request.user.is_authenticated and request.user == target_user
 
     if is_owner:
-        layout = target_user.update_preference(f"{media_type}_layout", request.GET.get("layout"))
-        sort_filter = target_user.update_preference(f"{media_type}_sort", request.GET.get("sort"))
-        status_filter = target_user.update_preference(f"{media_type}_status", request.GET.get("status"))
-        
-        # Сохранение параметра группировки
-        grouped_param = request.GET.get("grouped")
-        if grouped_param in ["true", "false"]:
-            is_grouped = grouped_param == "true"
-            setattr(target_user, f"{media_type}_grouped", is_grouped)
-            target_user.save(update_fields=[f"{media_type}_grouped"])
-        else:
-            is_grouped = getattr(target_user, f"{media_type}_grouped", True)
+        layout = target_user.update_preference(
+            f"{media_type}_layout",
+            request.GET.get("layout"),
+        )
+        sort_filter = target_user.update_preference(
+            f"{media_type}_sort",
+            request.GET.get("sort"),
+        )
+        status_filter = target_user.update_preference(
+            f"{media_type}_status",
+            request.GET.get("status"),
+        )
     else:
+        # Проверка публичности профиля через getattr для надежности
         if not getattr(target_user, "is_public", False):
-            raise Http404("User profile is private or not found.")
+            error_msg = "User profile is private or not found."
+            raise Http404(error_msg)
 
         enabled_media_types = target_user.get_enabled_media_types()
         if not enabled_media_types:
-            raise Http404("User doesn't have any media types enabled.")
-        if media_type not in enabled_media_types:
-            return redirect("medialist", username=target_user.username, media_type=enabled_media_types[0])
+            error_msg = "User doesn't have any media types enabled."
+            raise Http404(error_msg)
 
-        layout = target_user.get_valid_preference(f"{media_type}_layout", request.GET.get("layout"))
-        sort_filter = target_user.get_valid_preference(f"{media_type}_sort", request.GET.get("sort"))
-        status_filter = target_user.get_valid_preference(f"{media_type}_status", request.GET.get("status"))
-        is_grouped = getattr(target_user, f"{media_type}_grouped", True)
+        if media_type not in enabled_media_types:
+            return redirect(
+                "medialist",
+                username=target_user.username,
+                media_type=enabled_media_types[0],
+            )
+
+        layout = target_user.get_valid_preference(
+            f"{media_type}_layout",
+            request.GET.get("layout"),
+        )
+        sort_filter = target_user.get_valid_preference(
+            f"{media_type}_sort",
+            request.GET.get("sort"),
+        )
+        status_filter = target_user.get_valid_preference(
+            f"{media_type}_status",
+            request.GET.get("status"),
+        )
 
     search_query = request.GET.get("search", "")
     page = request.GET.get("page", 1)
@@ -174,35 +192,27 @@ def media_list(request, username, media_type):
         search=search_query,
     )
 
-    # ВАЖНО: Если включена группировка и выбран статус All, добавляем первичную сортировку по статусу
-    if is_grouped and status_filter == MediaStatusChoices.ALL:
-        media_queryset = media_queryset.order_by("status", *media_queryset.query.order_by)
-
     items_per_page = 32
     paginator = Paginator(media_queryset, items_per_page)
     media_page = paginator.get_page(page)
 
-    BasicMedia.objects.annotate_max_progress(media_page.object_list, media_type)
-    
-    # Меняем таргет для HTMX, чтобы при группировке заменялся весь блок, а не только грид/таблица
-    if is_grouped and status_filter == MediaStatusChoices.ALL:
-        layout_class = "#media-list-container"
-    else:
-        layout_class = ".media-grid" if layout == "grid" else "tbody"
+    BasicMedia.objects.annotate_max_progress(
+        media_page.object_list,
+        media_type,
+    )
 
     context = {
         "media_type": media_type,
         "media_type_plural": app_tags.media_type_readable_plural(media_type).lower(),
         "media_list": media_page,
         "current_layout": layout,
-        "layout_class": layout_class,
+        "layout_class": ".media-grid" if layout == "grid" else "tbody",
         "current_sort": sort_filter,
         "current_status": status_filter,
         "sort_choices": MediaSortChoices.choices,
         "status_choices": MediaStatusChoices.choices,
         "target_user": target_user,
-        "is_owner": is_owner,
-        "is_grouped": is_grouped,
+        "is_owner": is_owner,  # Передаем флаг в шаблон, чтобы скрыть кнопки от гостей
     }
 
     if request.headers.get("HX-Request"):
@@ -210,13 +220,11 @@ def media_list(request, username, media_type):
             if not media_page.object_list:
                 return HttpResponse(status=204)
             response = HttpResponse()
-            response["HX-Redirect"] = reverse("medialist", args=[target_user.username, media_type])
+            response["HX-Redirect"] = reverse(
+                "medialist", args=[target_user.username, media_type]
+            )
             return response
-            
-        # Новый шаблон для группировки через HTMX
-        if is_grouped and status_filter == MediaStatusChoices.ALL:
-            template_name = "app/components/media_grouped_items.html"
-        elif layout == "grid":
+        if layout == "grid":
             template_name = "app/components/media_grid_items.html"
         else:
             template_name = "app/components/media_table_items.html"
