@@ -1,8 +1,9 @@
 import tempfile
-from io import BytesIO
+from io import BytesIO, StringIO
 from unittest.mock import MagicMock, patch
 
 from django.conf import settings
+from django.core.management import call_command
 from django.test import TestCase, override_settings
 from PIL import Image
 
@@ -104,3 +105,44 @@ class PosterCacheTests(TestCase):
         mock_get.assert_not_called()
         self.item.refresh_from_db()
         self.assertFalse(self.item.image_local)
+
+
+class DownloadMissingPostersCommandTests(TestCase):
+    """Tests for the download_missing_posters backfill command."""
+
+    def setUp(self):
+        """Create one item with a real poster URL and one with the placeholder."""
+        self.real_item = Item.objects.create(
+            media_id="real",
+            source=Sources.IGDB.value,
+            media_type=MediaTypes.GAME.value,
+            title="Real",
+            image="http://example.com/real.png",
+        )
+        self.placeholder_item = Item.objects.create(
+            media_id="placeholder",
+            source=Sources.IGDB.value,
+            media_type=MediaTypes.GAME.value,
+            title="Placeholder",
+            image=settings.IMG_NONE,
+        )
+
+    @override_settings(DOWNLOAD_POSTERS=True)
+    @patch("app.management.commands.download_missing_posters.download_item_poster")
+    def test_command_processes_only_real_missing_posters(self, mock_task):
+        """--all --sync downloads real uncached posters and skips placeholders."""
+        call_command("download_missing_posters", "--all", "--sync", stdout=StringIO())
+
+        called_ids = {call.args[0] for call in mock_task.call_args_list}
+        self.assertIn(self.real_item.pk, called_ids)
+        self.assertNotIn(self.placeholder_item.pk, called_ids)
+
+    @override_settings(DOWNLOAD_POSTERS=False)
+    @patch("app.management.commands.download_missing_posters.download_item_poster")
+    def test_command_noop_when_downloads_disabled(self, mock_task):
+        """The command does nothing when DOWNLOAD_POSTERS is disabled."""
+        stderr = StringIO()
+        call_command("download_missing_posters", "--all", stderr=stderr)
+
+        mock_task.assert_not_called()
+        self.assertIn("DOWNLOAD_POSTERS is disabled", stderr.getvalue())
