@@ -41,6 +41,22 @@ def no_underscore(arg1):
 
 
 @register.filter
+def poster_url(obj):
+    """Return a locally cached poster URL when available, else the remote URL.
+
+    Works for ``Item`` model instances (which may have a cached ``image_local``)
+    as well as plain provider-metadata dicts, which only ever carry a remote
+    ``image`` URL.
+    """
+    if isinstance(obj, dict):
+        return obj.get("image", "")
+    local = getattr(obj, "image_local", None)
+    if local:
+        return local.url
+    return getattr(obj, "image", "")
+
+
+@register.filter
 def slug(arg1):
     """Return the slug of the string.
 

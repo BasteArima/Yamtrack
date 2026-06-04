@@ -58,6 +58,20 @@ class LayoutChoices(models.TextChoices):
     TABLE = "table", "Table"
 
 
+class MediaVisibilityChoices(models.TextChoices):
+    """Choices controlling who can see an enabled media type.
+
+    Only applied to viewers other than the owner; the owner always sees
+    every type they have enabled. Fully disabling a type (hidden from
+    everyone, including the owner) is done with the `{type}_enabled` toggle.
+    """
+
+    EVERYONE = "everyone", "Visible to everyone"
+    HIDDEN_ANON = "hidden_anon", "Hidden from guests"
+    HIDDEN_AUTH = "hidden_auth", "Hidden from other users"
+    OWNER_ONLY = "owner_only", "Only me"
+
+
 class CalendarLayoutChoices(models.TextChoices):
     """Choices for calendar layout options."""
 
@@ -300,6 +314,54 @@ class User(AbstractUser):
         max_length=20,
         default=MediaStatusChoices.ALL,
         choices=MediaStatusChoices,
+    )
+
+    # Per-media-type visibility for other viewers (only applied when the
+    # matching `{type}_enabled` toggle is on). See MediaVisibilityChoices.
+    tv_visibility = models.CharField(
+        max_length=20,
+        default=MediaVisibilityChoices.EVERYONE,
+        choices=MediaVisibilityChoices,
+    )
+    season_visibility = models.CharField(
+        max_length=20,
+        default=MediaVisibilityChoices.EVERYONE,
+        choices=MediaVisibilityChoices,
+    )
+    movie_visibility = models.CharField(
+        max_length=20,
+        default=MediaVisibilityChoices.EVERYONE,
+        choices=MediaVisibilityChoices,
+    )
+    anime_visibility = models.CharField(
+        max_length=20,
+        default=MediaVisibilityChoices.EVERYONE,
+        choices=MediaVisibilityChoices,
+    )
+    manga_visibility = models.CharField(
+        max_length=20,
+        default=MediaVisibilityChoices.EVERYONE,
+        choices=MediaVisibilityChoices,
+    )
+    game_visibility = models.CharField(
+        max_length=20,
+        default=MediaVisibilityChoices.EVERYONE,
+        choices=MediaVisibilityChoices,
+    )
+    book_visibility = models.CharField(
+        max_length=20,
+        default=MediaVisibilityChoices.EVERYONE,
+        choices=MediaVisibilityChoices,
+    )
+    comic_visibility = models.CharField(
+        max_length=20,
+        default=MediaVisibilityChoices.EVERYONE,
+        choices=MediaVisibilityChoices,
+    )
+    boardgame_visibility = models.CharField(
+        max_length=20,
+        default=MediaVisibilityChoices.EVERYONE,
+        choices=MediaVisibilityChoices,
     )
 
     # UI preferences
@@ -624,23 +686,55 @@ class User(AbstractUser):
         # CURRENT_DATE is the default
         return now
 
-    def get_enabled_media_types(self):
-        """Return a list of enabled media type values based on user preferences."""
+    def get_enabled_media_types(self, viewer=None):
+        """Return media type values this profile exposes to ``viewer``.
+
+        ``viewer`` is the user requesting the list (may be an anonymous user).
+        When ``viewer`` is ``None`` or the owner, every enabled type is
+        returned. For other viewers, each type's ``{type}_visibility``
+        preference decides whether it is exposed.
+        """
+        is_owner = viewer is None or (
+            getattr(viewer, "is_authenticated", False)
+            and getattr(viewer, "pk", None) == self.pk
+        )
+        viewer_authenticated = getattr(viewer, "is_authenticated", False)
+
         enabled_types = []
 
         for media_type in MediaTypes.values:
             if media_type == MediaTypes.EPISODE.value:
                 continue
 
-            enabled_field = f"{media_type}_enabled"
-            if getattr(self, enabled_field, False):
-                enabled_types.append(media_type)
+            if not getattr(self, f"{media_type}_enabled", False):
+                continue
+
+            if not is_owner:
+                visibility = getattr(
+                    self,
+                    f"{media_type}_visibility",
+                    MediaVisibilityChoices.EVERYONE,
+                )
+                if visibility == MediaVisibilityChoices.OWNER_ONLY:
+                    continue
+                if (
+                    visibility == MediaVisibilityChoices.HIDDEN_ANON
+                    and not viewer_authenticated
+                ):
+                    continue
+                if (
+                    visibility == MediaVisibilityChoices.HIDDEN_AUTH
+                    and viewer_authenticated
+                ):
+                    continue
+
+            enabled_types.append(media_type)
 
         return enabled_types
 
-    def get_active_media_types(self):
+    def get_active_media_types(self, viewer=None):
         """Return a list of active media type values based on user preferences."""
-        enabled_types = self.get_enabled_media_types()
+        enabled_types = self.get_enabled_media_types(viewer=viewer)
 
         # Add season if TV is enabled (and season isn't already in the list)
         if (

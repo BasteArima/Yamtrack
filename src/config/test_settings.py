@@ -15,6 +15,9 @@ CACHES = {
 
 CELERY_TASK_ALWAYS_EAGER = True
 
+# Never reach out to the network to download posters during tests.
+DOWNLOAD_POSTERS = False
+
 TESTING = True
 
 # Steam API key for testing

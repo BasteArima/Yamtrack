@@ -2,6 +2,7 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock, patch
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 from django.utils import timezone
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
@@ -10,6 +11,7 @@ from django_celery_results.models import TaskResult
 from users.models import (
     HomeSortChoices,
     MediaTypes,
+    MediaVisibilityChoices,
     QuickWatchDateChoices,
     WeekStartDayChoices,
 )
@@ -448,3 +450,72 @@ class UserWeekStartDayTests(TestCase):
         self.assertEqual(result, WeekStartDayChoices.SUNDAY)
         user.refresh_from_db()
         self.assertEqual(user.week_start_day, WeekStartDayChoices.SUNDAY)
+
+
+class MediaTypeVisibilityTests(TestCase):
+    """Tests for per-media-type visibility in get_enabled_media_types."""
+
+    def setUp(self):
+        """Create an owner with only tv/movie/anime enabled and another user."""
+        owner_credentials = {"username": "owner", "password": "testpassword"}
+        other_credentials = {"username": "other", "password": "testpassword"}
+        self.owner = get_user_model().objects.create_user(**owner_credentials)
+        self.other = get_user_model().objects.create_user(**other_credentials)
+        self.anon = AnonymousUser()
+
+        for media_type in MediaTypes.values:
+            if media_type == MediaTypes.EPISODE.value:
+                continue
+            setattr(
+                self.owner,
+                f"{media_type}_enabled",
+                media_type in ("tv", "movie", "anime"),
+            )
+        self.owner.save()
+
+    def test_owner_sees_all_enabled_regardless_of_visibility(self):
+        """The owner always sees every enabled type."""
+        self.owner.anime_visibility = MediaVisibilityChoices.OWNER_ONLY
+        self.owner.movie_visibility = MediaVisibilityChoices.HIDDEN_ANON
+        self.owner.save()
+
+        # viewer=None and viewer=owner are both the owner's own view
+        self.assertEqual(self.owner.get_enabled_media_types(), ["tv", "movie", "anime"])
+        self.assertEqual(
+            self.owner.get_enabled_media_types(viewer=self.owner),
+            ["tv", "movie", "anime"],
+        )
+
+    def test_everyone_visible_to_all_viewers(self):
+        """EVERYONE types are exposed to other users and guests."""
+        self.assertIn("tv", self.owner.get_enabled_media_types(viewer=self.other))
+        self.assertIn("tv", self.owner.get_enabled_media_types(viewer=self.anon))
+
+    def test_hidden_anon_hides_from_guests_only(self):
+        """HIDDEN_ANON keeps the type for authenticated viewers, not guests."""
+        self.owner.movie_visibility = MediaVisibilityChoices.HIDDEN_ANON
+        self.owner.save()
+
+        self.assertIn("movie", self.owner.get_enabled_media_types(viewer=self.other))
+        self.assertNotIn("movie", self.owner.get_enabled_media_types(viewer=self.anon))
+
+    def test_hidden_auth_hides_from_other_users_only(self):
+        """HIDDEN_AUTH hides the type from other logged-in users, not guests."""
+        self.owner.tv_visibility = MediaVisibilityChoices.HIDDEN_AUTH
+        self.owner.save()
+
+        self.assertNotIn("tv", self.owner.get_enabled_media_types(viewer=self.other))
+        self.assertIn("tv", self.owner.get_enabled_media_types(viewer=self.anon))
+
+    def test_owner_only_hidden_from_everyone_else(self):
+        """OWNER_ONLY hides the type from both other users and guests."""
+        self.owner.anime_visibility = MediaVisibilityChoices.OWNER_ONLY
+        self.owner.save()
+
+        self.assertNotIn("anime", self.owner.get_enabled_media_types(viewer=self.other))
+        self.assertNotIn("anime", self.owner.get_enabled_media_types(viewer=self.anon))
+
+    def test_disabled_type_hidden_even_from_owner(self):
+        """A type with its toggle off is never returned, even for the owner."""
+        self.assertNotIn("manga", self.owner.get_enabled_media_types())
+        self.assertNotIn("manga", self.owner.get_enabled_media_types(viewer=self.other))

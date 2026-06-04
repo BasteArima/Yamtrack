@@ -95,4 +95,8 @@ if settings.ADMIN_ENABLED:
 
 # Add debug toolbar if in DEBUG mode
 if settings.DEBUG:
+    from django.conf.urls.static import static
+
     urlpatterns.append(path("__debug__/", include("debug_toolbar.urls")))
+    # In production nginx serves MEDIA_ROOT directly (see nginx.conf).
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

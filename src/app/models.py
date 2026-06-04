@@ -1,4 +1,5 @@
 import logging
+import re
 import uuid
 
 from django.apps import apps
@@ -8,7 +9,7 @@ from django.core.validators import (
     MaxValueValidator,
     MinValueValidator,
 )
-from django.db import models
+from django.db import models, transaction
 from django.db.models import (
     CheckConstraint,
     Count,
@@ -64,6 +65,12 @@ class MediaTypes(models.TextChoices):
     BOARDGAME = "boardgame", "Boardgame"
 
 
+def poster_upload_path(instance, filename):  # noqa: ARG001
+    """Build a stable storage path for an item's cached poster."""
+    safe_id = re.sub(r"[^A-Za-z0-9_.-]", "_", str(instance.media_id))
+    return f"posters/{instance.source}/{instance.media_type}_{safe_id}.webp"
+
+
 class Item(CalendarTriggerMixin, models.Model):
     """Model to store basic information about media items."""
 
@@ -80,6 +87,12 @@ class Item(CalendarTriggerMixin, models.Model):
     )
     title = models.TextField()
     image = models.URLField()  # if add default, custom media entry will show the value
+    image_local = models.ImageField(
+        upload_to=poster_upload_path,
+        blank=True,
+        null=True,
+        help_text="Locally cached poster served from MEDIA_ROOT, if downloaded.",
+    )
     season_number = models.PositiveIntegerField(null=True, blank=True)
     episode_number = models.PositiveIntegerField(null=True, blank=True)
 
@@ -214,6 +227,25 @@ class Item(CalendarTriggerMixin, models.Model):
             events.tasks.reload_calendar.delay(items_to_process=items_to_process)
         else:
             events.tasks.reload_calendar(items_to_process=items_to_process)
+
+    @property
+    def image_url(self):
+        """Return the locally cached poster URL when available, else the remote one."""
+        if self.image_local:
+            return self.image_local.url
+        return self.image
+
+    def ensure_poster_cached(self):
+        """Schedule a one-time download of the remote poster to local storage."""
+        if not settings.DOWNLOAD_POSTERS:
+            return
+        if self.image_local or not self.image or self.image == settings.IMG_NONE:
+            return
+
+        item_id = self.pk
+        transaction.on_commit(
+            lambda: app.tasks.download_item_poster.delay(item_id),
+        )
 
 
 class MediaManager(models.Manager):
@@ -874,6 +906,9 @@ class Media(models.Model):
             self.process_status()
 
         super().save(*args, **kwargs)
+
+        # Cache the poster locally the first time an item is tracked.
+        self.item.ensure_poster_cached()
 
     def create_user_message(self, message, level):
         """Create a persistent user notification."""

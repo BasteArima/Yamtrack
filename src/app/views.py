@@ -153,7 +153,9 @@ def media_list(request, username, media_type):
             error_msg = "User profile is private or not found."
             raise Http404(error_msg)
 
-        enabled_media_types = target_user.get_enabled_media_types()
+        enabled_media_types = target_user.get_enabled_media_types(
+            viewer=request.user,
+        )
         if not enabled_media_types:
             error_msg = "User doesn't have any media types enabled."
             raise Http404(error_msg)

@@ -315,6 +315,19 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 if BASE_URL:
     STATIC_URL = f"{BASE_URL}/static/"
 
+# Media files (locally cached posters)
+# https://docs.djangoproject.com/en/stable/howto/static-files/#serving-files-uploaded-by-a-user
+
+MEDIA_URL = "media/"
+# Kept under db/ so the existing persistent "db" volume also covers cached
+# posters (matches the project's convention that db/ holds persistent data).
+MEDIA_ROOT = BASE_DIR / "db" / "media"
+
+if BASE_URL:
+    MEDIA_URL = f"{BASE_URL}/media/"
+
+Path(MEDIA_ROOT).mkdir(parents=True, exist_ok=True)
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/stable/ref/settings/#default-auto-field
 
@@ -342,6 +355,13 @@ TRACK_TIME = config("TRACK_TIME", default=True, cast=bool)
 TZ = zoneinfo.ZoneInfo(TIME_ZONE)
 
 IMG_NONE = "https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-38-picture-grey-c2ebdbb057f2a7614185931650f8cee23fa137b93812ccb132b9df511df1cfac.svg"
+
+# Download remote posters to MEDIA_ROOT when an item is added to a list, then
+# serve them locally instead of hotlinking the source CDN. Posters are resized
+# and re-encoded as WebP to keep storage and bandwidth low.
+DOWNLOAD_POSTERS = config("DOWNLOAD_POSTERS", default=True, cast=bool)
+POSTER_MAX_WIDTH = config("POSTER_MAX_WIDTH", default=400, cast=int)
+POSTER_WEBP_QUALITY = config("POSTER_WEBP_QUALITY", default=80, cast=int)
 
 REQUEST_TIMEOUT = 120  # seconds
 PER_PAGE = 24

@@ -17,6 +17,7 @@ from app.providers import tmdb
 from users.forms import NotificationSettingsForm, PasswordChangeForm, UserUpdateForm
 from users.models import (
     DateFormatChoices,
+    MediaVisibilityChoices,
     QuickWatchDateChoices,
     TimeFormatChoices,
     WeekStartDayChoices,
@@ -236,6 +237,7 @@ def preferences(request):
             "users/preferences.html",
             {
                 "media_types": media_types,
+                "visibility_choices": MediaVisibilityChoices.choices,
                 "quick_watch_date_choices": QuickWatchDateChoices.choices,
                 "date_format_choices": DateFormatChoices.choices,
                 "time_format_choices": TimeFormatChoices.choices,
@@ -287,6 +289,9 @@ def preferences(request):
             f"{media_type}_enabled",
             media_type in media_types_checked,
         )
+        visibility = request.POST.get(f"{media_type}_visibility")
+        if visibility in MediaVisibilityChoices.values:
+            setattr(request.user, f"{media_type}_visibility", visibility)
 
     # Save changes and redirect
     request.user.save()

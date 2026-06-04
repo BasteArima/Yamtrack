@@ -242,26 +242,40 @@
         </div>
         <p class="text-gray-400 mb-4 text-sm">
           Control which media types are visible throughout the app (sidebar, search, calendar, notifications).
+          The toggle turns a type on or off entirely; the dropdown limits who else can see it when it is on.
         </p>
 
         <div class="grid gap-3 md:grid-cols-3">
           {% for media_type in media_types %}
-            <div class="flex items-center justify-between p-3 bg-[#39404b] rounded-md">
-              <div class="flex items-center text-gray-400">
-                {% icon media_type is_active=False %}
-                <span class="text-gray-200 text-sm ml-2">{{ media_type|media_type_readable_plural }}</span>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                {% with enabled_field=media_type|add:"_enabled" %}
-                  <input class="sr-only peer"
-                         type="checkbox"
-                         name="media_types_checkboxes"
-                         value="{{ media_type }}"
-                         {% if user|get_attr:enabled_field %}checked{% endif %}>
-                {% endwith %}
-                <div class="w-9 h-5 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-px after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-indigo-600">
+            <div class="p-3 bg-[#39404b] rounded-md">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center text-gray-400">
+                  {% icon media_type is_active=False %}
+                  <span class="text-gray-200 text-sm ml-2">{{ media_type|media_type_readable_plural }}</span>
                 </div>
-              </label>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  {% with enabled_field=media_type|add:"_enabled" %}
+                    <input class="sr-only peer"
+                           type="checkbox"
+                           name="media_types_checkboxes"
+                           value="{{ media_type }}"
+                           {% if user|get_attr:enabled_field %}checked{% endif %}>
+                  {% endwith %}
+                  <div class="w-9 h-5 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-px after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-indigo-600">
+                  </div>
+                </label>
+              </div>
+              {% with visibility_field=media_type|add:"_visibility" %}
+                <select name="{{ media_type }}_visibility"
+                        class="mt-3 w-full text-xs bg-[#2c3136] text-gray-300 border border-gray-600 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                  {% for value, label in visibility_choices %}
+                    <option value="{{ value }}"
+                            {% if user|get_attr:visibility_field == value %}selected{% endif %}>
+                      {{ label }}
+                    </option>
+                  {% endfor %}
+                </select>
+              {% endwith %}
             </div>
           {% endfor %}
         </div>
