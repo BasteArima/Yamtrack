@@ -6,12 +6,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
 from django.core.cache import cache
-from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.db.models import prefetch_related_objects
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 from django.utils.text import slugify
@@ -42,6 +40,17 @@ from users.models import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Order in which status sections are shown on a media list page.
+STATUS_SECTION_ORDER = [
+    Status.IN_PROGRESS.value,
+    Status.PLANNING.value,
+    Status.COMPLETED.value,
+    Status.PAUSED.value,
+    Status.DROPPED.value,
+]
+# How many items each status section shows before the "Load all" button.
+SECTION_ITEM_LIMIT = 24
 
 
 @require_GET
@@ -124,6 +133,33 @@ def progress_edit(request, media_type, instance_id):
     )
 
 
+def _build_status_sections(user, media_type, statuses, sort_filter, search):
+    """Build per-status sections (with limited item previews) for a media list."""
+    sections = []
+    for status in statuses:
+        queryset = BasicMedia.objects.get_media_list(
+            user=user,
+            media_type=media_type,
+            status_filter=status,
+            sort_filter=sort_filter,
+            search=search,
+        )
+        total = queryset.count()
+        if not total:
+            continue
+        items = list(queryset[:SECTION_ITEM_LIMIT])
+        BasicMedia.objects.annotate_max_progress(items, media_type)
+        sections.append(
+            {
+                "status": status,
+                "id": slugify(status),
+                "items": items,
+                "total": total,
+            },
+        )
+    return sections
+
+
 @login_not_required
 @require_GET
 def media_list(request, username, media_type):
@@ -181,34 +217,58 @@ def media_list(request, username, media_type):
         )
 
     search_query = request.GET.get("search", "")
-    page = request.GET.get("page", 1)
 
     if not status_filter:
         status_filter = MediaStatusChoices.ALL
 
-    media_queryset = BasicMedia.objects.get_media_list(
-        user=target_user,
-        media_type=media_type,
-        status_filter=status_filter,
-        sort_filter=sort_filter,
-        search=search_query,
-    )
+    # "Load all" for a single status section returns just that section's items.
+    load_section = request.GET.get("load_section")
+    if request.headers.get("HX-Request") and load_section:
+        items = list(
+            BasicMedia.objects.get_media_list(
+                user=target_user,
+                media_type=media_type,
+                status_filter=load_section,
+                sort_filter=sort_filter,
+                search=search_query,
+            ),
+        )
+        BasicMedia.objects.annotate_max_progress(items, media_type)
+        items_template = (
+            "app/components/media_grid_items.html"
+            if layout == "grid"
+            else "app/components/media_table_items.html"
+        )
+        return render(
+            request,
+            items_template,
+            {
+                "media_list": items,
+                "media_type": media_type,
+                "target_user": target_user,
+                "is_owner": is_owner,
+            },
+        )
 
-    items_per_page = 32
-    paginator = Paginator(media_queryset, items_per_page)
-    media_page = paginator.get_page(page)
+    if status_filter == MediaStatusChoices.ALL:
+        statuses = STATUS_SECTION_ORDER
+    else:
+        statuses = [status_filter]
 
-    BasicMedia.objects.annotate_max_progress(
-        media_page.object_list,
+    sections = _build_status_sections(
+        target_user,
         media_type,
+        statuses,
+        sort_filter,
+        search_query,
     )
 
     context = {
         "media_type": media_type,
         "media_type_plural": app_tags.media_type_readable_plural(media_type).lower(),
-        "media_list": media_page,
+        "sections": sections,
+        "section_item_limit": SECTION_ITEM_LIMIT,
         "current_layout": layout,
-        "layout_class": ".media-grid" if layout == "grid" else "tbody",
         "current_sort": sort_filter,
         "current_status": status_filter,
         "sort_choices": MediaSortChoices.choices,
@@ -218,18 +278,7 @@ def media_list(request, username, media_type):
     }
 
     if request.headers.get("HX-Request"):
-        if request.headers.get("HX-Target") == "empty_list":
-            if not media_page.object_list:
-                return HttpResponse(status=204)
-            response = HttpResponse()
-            response["HX-Redirect"] = reverse(
-                "medialist", args=[target_user.username, media_type]
-            )
-            return response
-        if layout == "grid":
-            template_name = "app/components/media_grid_items.html"
-        else:
-            template_name = "app/components/media_table_items.html"
+        template_name = "app/components/media_sections.html"
     else:
         template_name = "app/media_list.html"
 

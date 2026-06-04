@@ -62,8 +62,17 @@ class MediaListViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "app/media_list.html")
 
-        self.assertIn("media_list", response.context)
-        self.assertEqual(response.context["media_list"].paginator.count, 5)
+        self.assertIn("sections", response.context)
+        sections = response.context["sections"]
+        # 2 completed + 3 in progress, grouped and ordered by status.
+        self.assertEqual(
+            [section["status"] for section in sections],
+            [Status.IN_PROGRESS.value, Status.COMPLETED.value],
+        )
+        self.assertEqual(sum(section["total"] for section in sections), 5)
+
+        # Fewer items than the section limit -> no "Load all" button.
+        self.assertNotContains(response, "Load all")
 
         self.assertIn("sort_choices", response.context)
         self.assertIn("status_choices", response.context)
@@ -89,7 +98,11 @@ class MediaListViewTests(TestCase):
         self.assertEqual(response.context["current_sort"], "score")
         self.assertEqual(response.context["current_layout"], "table")
 
-        self.assertEqual(response.context["media_list"].paginator.count, 2)
+        # A specific status filter yields a single section.
+        sections = response.context["sections"]
+        self.assertEqual(len(sections), 1)
+        self.assertEqual(sections[0]["status"], Status.COMPLETED.value)
+        self.assertEqual(sections[0]["total"], 2)
 
         self.user.refresh_from_db()
         self.assertEqual(self.user.movie_status, Status.COMPLETED.value)
@@ -97,14 +110,14 @@ class MediaListViewTests(TestCase):
         self.assertEqual(self.user.movie_layout, "table")
 
     def test_media_list_htmx_request(self):
-        """Test the media list view with HTMX request."""
+        """Filter/sort HTMX requests re-render the grouped sections."""
         response = self.client.get(
             reverse("medialist", args=[self.user.username, MediaTypes.MOVIE.value])
             + "?layout=grid",
             headers={"hx-request": "true"},
         )
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "app/components/media_grid_items.html")
+        self.assertTemplateUsed(response, "app/components/media_sections.html")
 
         response = self.client.get(
             reverse("medialist", args=[self.user.username, MediaTypes.MOVIE.value])
@@ -112,7 +125,27 @@ class MediaListViewTests(TestCase):
             headers={"hx-request": "true"},
         )
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "app/components/media_sections.html")
+
+    def test_media_list_load_section_returns_items(self):
+        """The 'Load all' HTMX request returns just one status section's items."""
+        response = self.client.get(
+            reverse("medialist", args=[self.user.username, MediaTypes.MOVIE.value])
+            + "?layout=grid&load_section=In+progress",
+            headers={"hx-request": "true"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "app/components/media_grid_items.html")
+        self.assertEqual(len(response.context["media_list"]), 3)
+
+        response = self.client.get(
+            reverse("medialist", args=[self.user.username, MediaTypes.MOVIE.value])
+            + "?layout=table&load_section=Completed",
+            headers={"hx-request": "true"},
+        )
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "app/components/media_table_items.html")
+        self.assertEqual(len(response.context["media_list"]), 2)
 
     def test_public_media_list_ignores_invalid_filters(self):
         """Test invalid public filters fall back to the target user's preferences."""
@@ -150,7 +183,7 @@ class MediaListViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("media_list", response.context)
+        self.assertIn("sections", response.context)
 
     def test_is_public_defaults_to_true(self):
         """Test new users have public profiles by default."""
@@ -186,4 +219,4 @@ class MediaListViewTests(TestCase):
             )
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn("media_list", response.context)
+        self.assertIn("sections", response.context)

@@ -1,0 +1,29 @@
+{% load app_tags %}
+
+<tbody>
+  <tr>
+    <td colspan="99" class="pt-8 pb-2">
+      {% include "app/components/media_status_header.html" with status=section.status count=section.total %}
+    </td>
+  </tr>
+</tbody>
+<tbody id="rows-{{ section.id }}">
+  {% include "app/components/media_table_items.html" with media_list=section.items %}
+</tbody>
+{% if section.total > section_item_limit %}
+  <tbody>
+    <tr>
+      <td colspan="99" class="py-3 text-center">
+        <button type="button"
+                hx-get="{% url 'medialist' target_user.username media_type %}?load_section={{ section.status|urlencode }}&sort={{ current_sort }}&search={{ request.GET.search|default:''|urlencode }}&layout={{ current_layout }}"
+                hx-target="#rows-{{ section.id }}"
+                hx-swap="innerHTML"
+                hx-indicator="#loading-indicator"
+                hx-on:click="this.closest('tbody').remove()"
+                class="rounded-md border border-gray-700 bg-[#2a2f35] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#313842] cursor-pointer">
+          Load all ({{ section.total }})
+        </button>
+      </td>
+    </tr>
+  </tbody>
+{% endif %}

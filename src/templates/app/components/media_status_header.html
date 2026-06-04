@@ -1,0 +1,25 @@
+{% load app_tags %}
+
+{% with slug=status|slugify %}
+  <div class="space-y-4">
+    <div class="flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#39404b] {{ status|status_color }}">
+          {% include "app/icons/states/"|add:slug|add:".svg" with classes="h-5 w-5" %}
+        </div>
+        <h2 class="text-2xl font-semibold {{ status|status_color }}">{{ status|media_status_readable }}</h2>
+      </div>
+      <span class="inline-flex items-center rounded-full border border-gray-700 bg-[#39404b] px-3 py-1 text-sm text-gray-300">
+        {{ count }} item{{ count|pluralize }}
+      </span>
+    </div>
+    <div class="relative h-px overflow-hidden rounded-full bg-gray-700/80">
+      <div class="absolute inset-y-0 left-0 w-full"
+           style="background: linear-gradient(to right, {{ status|status_stats_color }}, transparent);">
+      </div>
+      <div class="absolute top-1/2 left-0 h-1.5 w-1.5 -translate-y-1/2 rounded-full"
+           style="background: {{ status|status_stats_color }};">
+      </div>
+    </div>
+  </div>
+{% endwith %}

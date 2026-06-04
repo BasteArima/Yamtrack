@@ -44,7 +44,7 @@
                x-model="search"
                hx-get="{% url 'medialist' target_user.username media_type %}"
                hx-trigger="keyup changed delay:300ms, search"
-               {% if media_list %} hx-target="{{ layout_class }}" {% else %} hx-target="#empty_list" {% endif %}
+               hx-target="#media-sections" hx-swap="innerHTML"
                hx-include="#filter-form"
                hx-indicator="#search-indicator">
         {% include "app/icons/magnifying-glass.svg" with classes="w-6 h-6 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" %}
@@ -77,7 +77,7 @@
                x-transition:leave-end="transform opacity-0 scale-95">
             {% for value, label in status_choices %}
               <button hx-get="{% url 'medialist' target_user.username media_type %}"
-                      {% if media_list %} hx-target="{{ layout_class }}" {% else %} hx-target="#empty_list" {% endif %}
+                      hx-target="#media-sections" hx-swap="innerHTML"
                       hx-include="#filter-form"
                       hx-indicator="#loading-indicator"
                       class="block w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer"
@@ -110,7 +110,7 @@
                x-transition:leave-end="transform opacity-0 scale-95">
             {% for value, label in sort_choices %}
               <button hx-get="{% url 'medialist' target_user.username media_type %}"
-                      {% if media_list %} hx-target="{{ layout_class }}" {% else %} hx-target="#empty_list" {% endif %}
+                      hx-target="#media-sections" hx-swap="innerHTML"
                       hx-include="#filter-form"
                       hx-indicator="#loading-indicator"
                       class="block w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer"
@@ -137,48 +137,9 @@
       </div>
     </div>
 
-    {% if not media_list %}
-      <div id="empty_list"
-           class="flex flex-col items-center justify-center py-16 bg-[#2a2f35] rounded-lg">
-        <div class="text-center max-w-md mx-auto p-6">
-          <div class="bg-[#39404b] rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-            {% include "app/icons/edit.svg" with classes="w-8 h-8 text-gray-400" %}
-          </div>
-          <h3 class="text-xl font-semibold mb-2">No {{ media_type|media_type_readable_plural }} Tracked Yet</h3>
-          {% if request.user == target_user %}
-            <p class="text-gray-400 mb-6">
-              Start tracking your {{ media_type_plural }} to keep a record of what you've {{ media_type|media_past_verb }}.
-            </p>
-            <a href="{{ media_type|sample_search }}"
-               class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
-              Browse {{ media_type|media_type_readable_plural }}
-            </a>
-          {% endif %}
-        </div>
-      </div>
-    {% elif current_layout == "grid" %}
-      <div class="media-grid">{% include "app/components/media_grid_items.html" %}</div>
-    {% else %}
-      <div class="bg-[#2a2f35] p-4 rounded-lg overflow-hidden max-w-[calc(100svw-4rem)] overflow-x-scroll">
-        <table class="w-full bg-[#2a2f35]">
-          <thead class="text-left text-gray-400 text-sm">
-            <tr>
-              <th class="p-2 w-15"></th>
-              <th class="p-2 pe-8 w-2/5">Title</th>
-              <th class="p-2 text-center">Score</th>
-              {% if media_type != MediaTypes.MOVIE.value %}<th class="p-2 text-center">Progress</th>{% endif %}
-              {% if media_type == MediaTypes.TV.value %}<th class="p-2 text-center">Last Watched</th>{% endif %}
-              <th class="p-2 text-center">Status</th>
-              <th class="p-2 text-center">Start Date</th>
-              <th class="p-2 text-center">End Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% include "app/components/media_table_items.html" %}
-          </tbody>
-        </table>
-      </div>
-    {% endif %}
+    <div id="media-sections">
+      {% include "app/components/media_sections.html" %}
+    </div>
 
     <div id="loading-indicator" class="htmx-indicator text-center pt-8">
       <div class="inline-flex justify-center items-center">
