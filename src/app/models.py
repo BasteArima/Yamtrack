@@ -242,9 +242,11 @@ class Item(CalendarTriggerMixin, models.Model):
         if self.image_local or not self.image or self.image == settings.IMG_NONE:
             return
 
+        from app.tasks import download_item_poster
+
         item_id = self.pk
         transaction.on_commit(
-            lambda: app.tasks.download_item_poster.delay(item_id),
+            lambda: download_item_poster.delay(item_id),
         )
 
 
