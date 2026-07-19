@@ -54,6 +54,7 @@ class UserUpdateForm(forms.ModelForm):
 
     class Meta:
         """Only allow updating username and visibility."""
+
         model = User
         fields = ["username", "is_public"]
 

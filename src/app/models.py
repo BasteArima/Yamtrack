@@ -242,7 +242,8 @@ class Item(CalendarTriggerMixin, models.Model):
         if self.image_local or not self.image or self.image == settings.IMG_NONE:
             return
 
-        from app.tasks import download_item_poster
+        # Lazy import avoids a models<->tasks circular import
+        from app.tasks import download_item_poster  # noqa: PLC0415
 
         item_id = self.pk
         transaction.on_commit(
