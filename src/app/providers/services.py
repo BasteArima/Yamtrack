@@ -78,6 +78,10 @@ session.mount(
     "https://boardgamegeek.com/xmlapi2",
     LimiterAdapter(per_second=2),
 )
+session.mount(
+    "https://shikimori.one/api",
+    LimiterAdapter(per_minute=60),
+)
 
 
 class ProviderAPIError(Exception):

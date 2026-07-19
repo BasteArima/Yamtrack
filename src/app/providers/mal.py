@@ -163,7 +163,7 @@ def manga(media_id):
     if data is None:
         url = f"{base_url}/manga/{media_id}"
         params = {
-            "fields": f"{base_fields},num_chapters,related_manga,recommendations",
+            "fields": f"{base_fields},num_chapters,related_manga,recommendations,pictures",  # noqa: E501
         }
 
         try:
@@ -186,6 +186,7 @@ def manga(media_id):
             "media_type": MediaTypes.MANGA.value,
             "title": response["title"],
             "image": get_image_url(response),
+            "gallery": get_gallery(response),
             "synopsis": get_synopsis(response),
             "max_progress": num_chapters,
             "genres": get_genres(response),
@@ -235,6 +236,27 @@ def get_image_url(response):
         return response["main_picture"]["large"]
     except KeyError:
         return settings.IMG_NONE
+
+
+# Max number of gallery images shown on the media details page
+GALLERY_LIMIT = 15
+
+
+def get_gallery(response):
+    """Return alternate cover art from the MAL ``pictures`` field as a gallery.
+
+    MAL exposes no scene screenshots, so this is a gallery of alternate covers
+    (hotlinked from the MAL CDN), used as the fallback for manga.
+    """
+    gallery = []
+    for picture in response.get("pictures", [])[:GALLERY_LIMIT]:
+        large = picture.get("large")
+        medium = picture.get("medium")
+        thumb = medium or large
+        full = large or medium
+        if thumb and full:
+            gallery.append({"thumb": thumb, "full": full})
+    return gallery
 
 
 def get_readable_status(response):

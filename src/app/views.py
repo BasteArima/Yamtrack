@@ -29,7 +29,7 @@ from app.models import (
     Status,
     UserMessage,
 )
-from app.providers import manual, services, tmdb
+from app.providers import manual, services, shikimori, tmdb
 from app.templatetags import app_tags
 from users.models import (
     DateFormatChoices,
@@ -324,6 +324,12 @@ def media_search(request):
 def media_details(request, source, media_type, media_id, title):  # noqa: ARG001 title for URL
     """Return the details page for a media item."""
     media_metadata = services.get_media_metadata(media_type, media_id, source)
+
+    # Anime screenshots aren't in the MAL API; pull them from Shikimori as a
+    # fallback gallery (never fatal — an empty gallery just hides the section).
+    if media_type == MediaTypes.ANIME.value:
+        media_metadata["gallery"] = shikimori.get_gallery(media_id)
+
     user_medias = BasicMedia.objects.filter_media_prefetch(
         request.user,
         media_id,

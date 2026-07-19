@@ -140,6 +140,7 @@ def comic(media_id):
                 response["last_issue"]["issue_number"],
             ),
             "image": get_image(response),
+            "gallery": get_gallery(media_id),
             "synopsis": get_synopsis(response),
             "genres": get_genres(response),
             "score": None,
@@ -170,6 +171,47 @@ def get_image(response):
     if "image" in response:
         return response["image"]["medium_url"]
     return settings.IMG_NONE
+
+
+# Max number of gallery images shown on the media details page
+GALLERY_LIMIT = 15
+
+
+def get_gallery(volume_id):
+    """Return a gallery of issue cover images for the comic volume.
+
+    Comics have no interior-page source, so the gallery shows the covers of the
+    volume's issues. Images are hotlinked from the ComicVine CDN. Returns an
+    empty list on any failure so the section is simply hidden.
+    """
+    params = {
+        "api_key": settings.COMICVINE_API,
+        "format": "json",
+        "filter": f"volume:{volume_id}",
+        "field_list": "image,issue_number",
+        "sort": "cover_date:asc",
+        "limit": GALLERY_LIMIT,
+    }
+    try:
+        response = services.api_request(
+            Sources.COMICVINE.value,
+            "GET",
+            f"{base_url}/issues/",
+            params=params,
+            headers=headers,
+        )
+    except requests.exceptions.HTTPError:
+        logger.warning("Failed to fetch ComicVine issue gallery for %s", volume_id)
+        return []
+
+    gallery = []
+    for issue in response.get("results", []):
+        image = issue.get("image") or {}
+        thumb = image.get("medium_url")
+        full = image.get("super_url") or image.get("original_url") or thumb
+        if thumb and full:
+            gallery.append({"thumb": thumb, "full": full})
+    return gallery
 
 
 def get_synopsis(response):

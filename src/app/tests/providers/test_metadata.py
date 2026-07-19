@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 
 import requests
 from django.conf import settings
+from django.core.cache import cache
 from django.test import TestCase
 
 from app.models import Episode, Item, MediaTypes, Sources
@@ -17,6 +18,7 @@ from app.providers import (
     manual,
     openlibrary,
     services,
+    shikimori,
     tmdb,
 )
 
@@ -772,3 +774,68 @@ class Gallery(TestCase):
             },
         )
         self.assertEqual(tmdb.get_gallery({}), [])
+
+    @patch("app.providers.shikimori.services.api_request")
+    def test_shikimori_gallery_id_match(self, mock_api):
+        """Matching myanimelist_id -> screenshots are hotlinked from Shikimori."""
+        cache.clear()
+        mock_api.side_effect = [
+            {"id": 1, "myanimelist_id": 1},
+            [
+                {"original": "/o1.jpg", "preview": "/p1.jpg"},
+                {"original": "/o2.jpg", "preview": "/p2.jpg"},
+            ],
+        ]
+        gallery = shikimori.get_gallery(1)
+
+        self.assertEqual(len(gallery), 2)
+        self.assertEqual(
+            gallery[0],
+            {
+                "thumb": "https://shikimori.one/p1.jpg",
+                "full": "https://shikimori.one/o1.jpg",
+            },
+        )
+
+    @patch("app.providers.shikimori.services.api_request")
+    def test_shikimori_gallery_id_mismatch(self, mock_api):
+        """Diverging Shikimori/MAL id -> no gallery (avoids wrong screenshots)."""
+        cache.clear()
+        mock_api.return_value = {"id": 999, "myanimelist_id": 999}
+
+        self.assertEqual(shikimori.get_gallery(2), [])
+        # screenshots endpoint must not be reached after a mismatch
+        self.assertEqual(mock_api.call_count, 1)
+
+    @patch("app.providers.shikimori.services.api_request")
+    def test_shikimori_gallery_error(self, mock_api):
+        """A network error never propagates -> empty gallery."""
+        cache.clear()
+        mock_api.side_effect = requests.exceptions.ConnectionError()
+
+        self.assertEqual(shikimori.get_gallery(3), [])
+
+    @patch("app.providers.comicvine.services.api_request")
+    def test_comicvine_gallery_issue_covers(self, mock_api):
+        """Issue covers become thumb/full URLs, falling back when large is absent."""
+        mock_api.return_value = {
+            "results": [
+                {"issue_number": "1", "image": {"medium_url": "m1", "super_url": "s1"}},
+                {"issue_number": "2", "image": {"medium_url": "m2"}},
+            ],
+        }
+        gallery = comicvine.get_gallery("123")
+
+        self.assertEqual(gallery[0], {"thumb": "m1", "full": "s1"})
+        self.assertEqual(gallery[1], {"thumb": "m2", "full": "m2"})
+
+    def test_mal_gallery_pictures(self):
+        """MAL pictures become an alternate-cover gallery; missing -> empty."""
+        response = {
+            "pictures": [{"medium": "m1", "large": "l1"}, {"large": "l2"}],
+        }
+        gallery = mal.get_gallery(response)
+
+        self.assertEqual(gallery[0], {"thumb": "m1", "full": "l1"})
+        self.assertEqual(gallery[1], {"thumb": "l2", "full": "l2"})
+        self.assertEqual(mal.get_gallery({}), [])

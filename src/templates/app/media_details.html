@@ -498,7 +498,9 @@
       {# Screenshots / Gallery #}
       {% if media.gallery %}
         <section class="mb-8" x-data="{ lightbox: false, current: '' }">
-          <h2 class="text-xl font-bold mb-4">Screenshots</h2>
+          <h2 class="text-xl font-bold mb-4">
+            {% if media.media_type == MediaTypes.MANGA.value or media.media_type == MediaTypes.COMIC.value %}Covers{% else %}Screenshots{% endif %}
+          </h2>
           <div class="flex overflow-x-auto gap-x-4 pb-5">
             {% for shot in media.gallery %}
               <img src="{{ IMG_NONE }}"
