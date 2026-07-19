@@ -431,6 +431,29 @@
             {% include "app/icons/circle-spinning-clockwise.svg" with classes="w-4 h-4" %}
           </div>
         </button>
+
+        {# Manage Screenshots (custom items only) #}
+        {% if media.source == Sources.MANUAL.value and user_medias %}
+          <div x-data="{ screenshotsOpen: false }">
+            <button class="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition duration-300 cursor-pointer"
+                    title="Manage screenshots"
+                    hx-get="{% media_view_url 'screenshots_modal' media %}"
+                    hx-target="#{% component_id 'screenshots' media %}"
+                    hx-trigger="click once"
+                    @click="screenshotsOpen = true">
+              {% include "app/icons/image.svg" with classes="w-4 h-4" %}
+            </button>
+
+            <div x-show="screenshotsOpen"
+                 @keydown.escape.window="screenshotsOpen = false"
+                 class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+              <div class="w-152 max-h-[90vh] px-4 md:px-0 relative z-60"
+                   @click.outside="screenshotsOpen = false">
+                <div id="{% component_id 'screenshots' media %}"></div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
       </div>
 
       {# Media Details #}

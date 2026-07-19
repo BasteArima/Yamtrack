@@ -1,0 +1,99 @@
+{% load app_tags %}
+{# djlint:off #}
+<div class="bg-[#2a2f35] rounded-lg p-6 max-h-[90vh] overflow-y-auto" x-data="{
+  dragEl: null,
+  reorderUrl: '{% media_view_url 'screenshots_reorder' media %}',
+  csrf: '{{ csrf_token }}',
+
+  onDragStart(e) {
+    this.dragEl = e.target.closest('[data-shot]');
+    if (this.dragEl) this.dragEl.style.opacity = '0.4';
+  },
+
+  onDragEnter(e) {
+    const target = e.target.closest('[data-shot]');
+    if (!target || !this.dragEl || target === this.dragEl) return;
+    const container = target.parentNode;
+    const nodes = Array.from(container.querySelectorAll('[data-shot]'));
+    if (nodes.indexOf(target) < nodes.indexOf(this.dragEl)) {
+      container.insertBefore(this.dragEl, target);
+    } else {
+      container.insertBefore(this.dragEl, target.nextSibling);
+    }
+  },
+
+  onDragEnd() {
+    if (this.dragEl) this.dragEl.style.opacity = '';
+    this.dragEl = null;
+    this.persist();
+  },
+
+  persist() {
+    const ids = Array.from(this.$refs.grid.querySelectorAll('[data-shot]')).map(el => el.dataset.shot);
+    const body = new URLSearchParams();
+    ids.forEach(id => body.append('order', id));
+    fetch(this.reorderUrl, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': this.csrf, 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+    });
+  },
+}">
+{# djlint:on #}
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-xl font-bold">Manage Screenshots</h2>
+    <span class="text-sm text-gray-400">{{ screenshots|length }} screenshot{{ screenshots|length|pluralize }}</span>
+  </div>
+
+  {% if screenshots %}
+    <p class="text-xs text-gray-400 mb-2">Drag a screenshot to reorder.</p>
+    <div x-ref="grid" class="grid grid-cols-2 gap-3 mb-4">
+      {% for shot in screenshots %}
+        <div data-shot="{{ shot.id }}"
+             draggable="true"
+             style="cursor: move;"
+             @dragstart="onDragStart($event)"
+             @dragenter.prevent="onDragEnter($event)"
+             @dragover.prevent
+             @dragend="onDragEnd()"
+             class="relative rounded-lg overflow-hidden border border-gray-600">
+          <img src="{{ shot.src }}" alt="Screenshot" class="w-full h-24 object-cover">
+          <button type="button"
+                  title="Delete screenshot"
+                  hx-post="{% url 'screenshots_delete' shot.id %}"
+                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                  hx-target="#{% component_id 'screenshots' media %}"
+                  hx-swap="innerHTML"
+                  class="absolute top-2 right-2 p-1 bg-black/50 text-white rounded-full transition-colors cursor-pointer">
+            {% include "app/icons/circle-x.svg" with classes="w-4 h-4" %}
+          </button>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-gray-400 mb-4">No screenshots yet. Add some below.</p>
+  {% endif %}
+
+  <form hx-post="{% media_view_url 'screenshots_add' media %}"
+        hx-encoding="multipart/form-data"
+        hx-target="#{% component_id 'screenshots' media %}"
+        hx-swap="innerHTML"
+        class="space-y-2 border-t border-gray-700 pt-4">
+    {% csrf_token %}
+    <label class="block text-sm font-medium text-gray-300">Add screenshots</label>
+    <input type="file"
+           name="screenshot_files"
+           accept="image/*"
+           multiple
+           class="w-full p-2 bg-[#39404b] rounded-md text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#4a9eff]">
+    <textarea class="w-full p-2 bg-[#39404b] rounded-md text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#4a9eff] appearance-none"
+              rows="2"
+              name="screenshot_urls"
+              placeholder="https://example.com/screenshot.jpg (one URL per line)"></textarea>
+    <button type="submit"
+            class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm cursor-pointer">
+      {% include "app/icons/plus.svg" with classes="w-4 h-4 mr-2" %}
+      Add
+    </button>
+  </form>
+</div>

@@ -16,6 +16,7 @@ def metadata(media_id, media_type):
         "title": item.title,
         "max_progress": None,
         "image": item.image,
+        "gallery": get_gallery(item),
         "synopsis": "No synopsis available.",
         "score": None,
         "score_count": None,
@@ -35,6 +36,14 @@ def metadata(media_id, media_type):
         response["max_progress"] = 1
 
     return response
+
+
+def get_gallery(item):
+    """Return the stored screenshots of a custom item as a gallery."""
+    return [
+        {"thumb": screenshot.src, "full": screenshot.src}
+        for screenshot in item.screenshots.all()
+    ]
 
 
 def season(media_id, season_number):

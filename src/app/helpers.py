@@ -1,21 +1,103 @@
 from datetime import date, datetime
+from io import BytesIO
 from urllib.parse import parse_qsl, urlencode, urljoin, urlparse
+from uuid import uuid4
 
 from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.files.base import ContentFile
+from django.core.validators import URLValidator
 from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils import timezone
 from django.utils.encoding import iri_to_uri
 from django.utils.http import url_has_allowed_host_and_scheme
+from PIL import Image
 
-from app.models import BasicMedia, Item, MediaTypes, Status
+from app.models import BasicMedia, Item, ItemScreenshot, MediaTypes, Status
 
 YEAR_ONLY_PARTS = 1
 YEAR_MONTH_PARTS = 2
+
+# Cap how many screenshots a single custom item can hold.
+MAX_SCREENSHOTS_PER_ITEM = 30
+
+
+def optimize_image(raw_bytes, max_width, quality):
+    """Resize (down to ``max_width``) and re-encode raw image bytes as WebP.
+
+    Shared by the poster-download task and custom-media screenshot uploads to
+    keep stored images small. Returns the WebP bytes, or ``None`` when the
+    input isn't a valid image.
+    """
+    try:
+        image = Image.open(BytesIO(raw_bytes))
+        image.load()
+    except OSError:
+        return None
+
+    if image.mode != "RGB":
+        image = image.convert("RGB")
+
+    if max_width and image.width > max_width:
+        ratio = max_width / image.width
+        new_height = max(1, round(image.height * ratio))
+        image = image.resize((max_width, new_height), Image.LANCZOS)
+
+    buffer = BytesIO()
+    image.save(buffer, format="WEBP", quality=quality)
+    return buffer.getvalue()
+
+
+def add_screenshots(item, files, urls):
+    """Attach screenshots to a custom item from uploaded files and/or URLs.
+
+    Uploaded files are re-encoded to WebP and stored locally; URLs are stored
+    as-is and hotlinked. Invalid files or URLs are skipped. New screenshots are
+    appended after any existing ones, and the total is capped at
+    ``MAX_SCREENSHOTS_PER_ITEM``. Returns the number of screenshots created.
+    """
+    position = item.screenshots.count()
+    remaining = MAX_SCREENSHOTS_PER_ITEM - position
+    if remaining <= 0:
+        return 0
+
+    created = 0
+    validate_url = URLValidator()
+
+    for upload in files:
+        if created >= remaining:
+            break
+        webp = optimize_image(
+            upload.read(),
+            settings.SCREENSHOT_MAX_WIDTH,
+            settings.SCREENSHOT_WEBP_QUALITY,
+        )
+        if webp is None:
+            continue
+        screenshot = ItemScreenshot(item=item, position=position)
+        screenshot.image.save(f"{uuid4().hex}.webp", ContentFile(webp), save=True)
+        position += 1
+        created += 1
+
+    for raw_url in urls:
+        if created >= remaining:
+            break
+        url = raw_url.strip()
+        if not url:
+            continue
+        try:
+            validate_url(url)
+        except ValidationError:
+            continue
+        ItemScreenshot.objects.create(item=item, url=url, position=position)
+        position += 1
+        created += 1
+
+    return created
 
 
 def get_owned_media_or_404(request, media_type, instance_id, *, prefetch=False):

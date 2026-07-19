@@ -23,6 +23,7 @@ from app.models import (
     TV,
     BasicMedia,
     Item,
+    ItemScreenshot,
     MediaTypes,
     Season,
     Sources,
@@ -825,12 +826,113 @@ def create_entry(request):
 
     media_form.save()
 
+    # Attach any uploaded / linked screenshots to the new custom item
+    helpers.add_screenshots(
+        item,
+        request.FILES.getlist("screenshot_files"),
+        request.POST.get("screenshot_urls", "").splitlines(),
+    )
+
     # Success message
     msg = f"{item} added successfully."
     messages.success(request, msg)
     logger.info(msg)
 
     return redirect("create_entry")
+
+
+def _get_owned_manual_item(request, source, media_type, media_id):
+    """Return the manual Item the user tracks, or raise 404.
+
+    Screenshots can only be managed on custom (manual) items the requesting
+    user actually owns (has in their library).
+    """
+    if source != Sources.MANUAL.value:
+        raise Http404
+    item = get_object_or_404(
+        Item,
+        media_id=media_id,
+        media_type=media_type,
+        source=source,
+    )
+    if not BasicMedia.objects.filter_media(
+        request.user,
+        media_id,
+        media_type,
+        source,
+    ).exists():
+        raise Http404
+    return item
+
+
+def _render_screenshots_modal(request, item):
+    """Render the manage-screenshots modal for a custom item."""
+    return render(
+        request,
+        "app/components/fill_screenshots.html",
+        {
+            "media": {
+                "source": item.source,
+                "media_type": item.media_type,
+                "media_id": item.media_id,
+            },
+            "screenshots": item.screenshots.all(),
+        },
+    )
+
+
+@require_GET
+def screenshots_modal(request, source, media_type, media_id):
+    """Return the manage-screenshots modal for a custom item."""
+    item = _get_owned_manual_item(request, source, media_type, media_id)
+    return _render_screenshots_modal(request, item)
+
+
+@require_POST
+def screenshots_add(request, source, media_type, media_id):
+    """Add uploaded / linked screenshots to a custom item."""
+    item = _get_owned_manual_item(request, source, media_type, media_id)
+    helpers.add_screenshots(
+        item,
+        request.FILES.getlist("screenshot_files"),
+        request.POST.get("screenshot_urls", "").splitlines(),
+    )
+    return _render_screenshots_modal(request, item)
+
+
+@require_POST
+def screenshots_reorder(request, source, media_type, media_id):
+    """Persist a new screenshot order for a custom item."""
+    item = _get_owned_manual_item(request, source, media_type, media_id)
+    ordered_ids = request.POST.getlist("order")
+    id_to_screenshot = {str(shot.id): shot for shot in item.screenshots.all()}
+
+    to_update = []
+    for position, screenshot_id in enumerate(ordered_ids):
+        screenshot = id_to_screenshot.get(screenshot_id)
+        if screenshot is not None:
+            screenshot.position = position
+            to_update.append(screenshot)
+
+    if to_update:
+        ItemScreenshot.objects.bulk_update(to_update, ["position"])
+    return HttpResponse(status=204)
+
+
+@require_POST
+def screenshots_delete(request, screenshot_id):
+    """Delete a screenshot from a custom item the user owns."""
+    screenshot = get_object_or_404(ItemScreenshot, id=screenshot_id)
+    item = _get_owned_manual_item(
+        request,
+        screenshot.item.source,
+        screenshot.item.media_type,
+        screenshot.item.media_id,
+    )
+    if screenshot.image:
+        screenshot.image.delete(save=False)
+    screenshot.delete()
+    return _render_screenshots_modal(request, item)
 
 
 @require_GET

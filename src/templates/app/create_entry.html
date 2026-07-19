@@ -12,7 +12,7 @@
       <p class="text-gray-400">Add a custom media entry to your collection if it's not available in the database.</p>
     </div>
     {# djlint:off #}
-    <form method="post" class="space-y-6" x-data="{
+    <form method="post" enctype="multipart/form-data" class="space-y-6" x-data="{
       mediaType: 'tv',
       placeholderHtml: null,
 
@@ -244,6 +244,23 @@
             <!-- Hidden error icon template -->
             <div id="error-icon" class="hidden">{% include "app/icons/circle-x.svg" with classes="w-8 h-8 text-red-500" %}</div>
           </div>
+        </div>
+
+        <!-- Screenshots (All types) -->
+        <div x-show="showField('image')">
+          <label class="block text-sm font-medium mb-2 text-gray-300">Screenshots</label>
+          <p class="text-xs text-gray-400 mb-2">
+            Upload image files and/or paste URLs (one per line). You can reorder or add more after creating the entry.
+          </p>
+          <input type="file"
+                 name="screenshot_files"
+                 accept="image/*"
+                 multiple
+                 class="w-full p-2 bg-[#39404b] rounded-md text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#4a9eff]">
+          <textarea class="w-full mt-2 p-2 bg-[#39404b] rounded-md text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#4a9eff] appearance-none"
+                    rows="3"
+                    name="screenshot_urls"
+                    placeholder="https://example.com/screenshot.jpg (one URL per line)"></textarea>
         </div>
 
         <!-- Score field (TV, Movie, Anime, Manga, Game, Book, Season) -->

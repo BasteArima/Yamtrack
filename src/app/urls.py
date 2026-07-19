@@ -59,6 +59,26 @@ urlpatterns = [
     ),
     path("episode_save", views.episode_save, name="episode_save"),
     path(
+        "screenshots_modal/<source:source>/<media_type:media_type>/<str:media_id>",
+        views.screenshots_modal,
+        name="screenshots_modal",
+    ),
+    path(
+        "screenshots/add/<source:source>/<media_type:media_type>/<str:media_id>",
+        views.screenshots_add,
+        name="screenshots_add",
+    ),
+    path(
+        "screenshots/reorder/<source:source>/<media_type:media_type>/<str:media_id>",
+        views.screenshots_reorder,
+        name="screenshots_reorder",
+    ),
+    path(
+        "screenshots/<int:screenshot_id>/delete",
+        views.screenshots_delete,
+        name="screenshots_delete",
+    ),
+    path(
         "history_modal/<source:source>/<media_type:media_type>/<str:media_id>",
         views.history_modal,
         name="history_modal",

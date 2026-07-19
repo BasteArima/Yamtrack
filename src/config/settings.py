@@ -363,6 +363,10 @@ DOWNLOAD_POSTERS = config("DOWNLOAD_POSTERS", default=True, cast=bool)
 POSTER_MAX_WIDTH = config("POSTER_MAX_WIDTH", default=400, cast=int)
 POSTER_WEBP_QUALITY = config("POSTER_WEBP_QUALITY", default=80, cast=int)
 
+# Uploaded custom-media screenshots are resized and re-encoded as WebP too.
+SCREENSHOT_MAX_WIDTH = config("SCREENSHOT_MAX_WIDTH", default=1280, cast=int)
+SCREENSHOT_WEBP_QUALITY = config("SCREENSHOT_WEBP_QUALITY", default=80, cast=int)
+
 REQUEST_TIMEOUT = 120  # seconds
 PER_PAGE = 24
 

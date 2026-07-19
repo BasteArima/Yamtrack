@@ -71,6 +71,12 @@ def poster_upload_path(instance, filename):  # noqa: ARG001
     return f"posters/{instance.source}/{instance.media_type}_{safe_id}.webp"
 
 
+def screenshot_upload_path(instance, filename):
+    """Build the storage path for an uploaded custom-media screenshot."""
+    safe_id = re.sub(r"[^A-Za-z0-9_.-]", "_", str(instance.item.media_id))
+    return f"screenshots/{instance.item.media_type}_{safe_id}/{filename}"
+
+
 class Item(CalendarTriggerMixin, models.Model):
     """Model to store basic information about media items."""
 
@@ -249,6 +255,53 @@ class Item(CalendarTriggerMixin, models.Model):
         transaction.on_commit(
             lambda: download_item_poster.delay(item_id),
         )
+
+
+class ItemScreenshot(models.Model):
+    """A screenshot/cover attached to a custom (manual) media item.
+
+    Each screenshot is either an uploaded, locally stored image or a hotlinked
+    external URL. Ordering within an item is controlled by ``position``.
+    """
+
+    item = models.ForeignKey(
+        Item,
+        on_delete=models.CASCADE,
+        related_name="screenshots",
+    )
+    image = models.ImageField(
+        upload_to=screenshot_upload_path,
+        blank=True,
+        help_text="Locally stored uploaded screenshot, if any.",
+    )
+    url = models.URLField(
+        max_length=500,
+        blank=True,
+        help_text="Hotlinked external screenshot URL, if any.",
+    )
+    position = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        """Meta options for the model."""
+
+        ordering = ["position", "id"]
+        constraints = [
+            models.CheckConstraint(
+                condition=~Q(image="") | ~Q(url=""),
+                name="screenshot_has_image_or_url",
+            ),
+        ]
+
+    def __str__(self):
+        """Return a readable identifier for the screenshot."""
+        return f"Screenshot {self.position} of {self.item_id}"
+
+    @property
+    def src(self):
+        """Return the URL to display: the local file when present, else the url."""
+        if self.image:
+            return self.image.url
+        return self.url
 
 
 class MediaManager(models.Manager):
