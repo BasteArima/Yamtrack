@@ -495,6 +495,34 @@
     </div>
 
     <div class="w-full md:w-3/4">
+      {# Screenshots / Gallery #}
+      {% if media.gallery %}
+        <section class="mb-8" x-data="{ lightbox: false, current: '' }">
+          <h2 class="text-xl font-bold mb-4">Screenshots</h2>
+          <div class="flex overflow-x-auto gap-x-4 pb-5">
+            {% for shot in media.gallery %}
+              <img src="{{ IMG_NONE }}"
+                   data-src="{{ shot.thumb }}"
+                   alt="{{ media.title }} screenshot {{ forloop.counter }}"
+                   class="lazyload w-96 h-48 shrink-0 object-cover rounded-lg shadow-lg cursor-pointer"
+                   @click="current = '{{ shot.full }}'; lightbox = true">
+            {% endfor %}
+          </div>
+
+          {# Lightbox #}
+          <div x-show="lightbox"
+               @keydown.escape.window="lightbox = false"
+               @click="lightbox = false"
+               class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 cursor-pointer">
+            <img :src="current"
+                 alt="{{ media.title }} screenshot"
+                 class="rounded-lg"
+                 style="max-width:92vw; max-height:90vh;"
+                 @click.stop>
+          </div>
+        </section>
+      {% endif %}
+
       {% if media.cast %}
         <section class="mb-8">
           <h2 class="text-xl font-bold mb-4">Cast</h2>

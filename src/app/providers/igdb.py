@@ -273,7 +273,7 @@ def game(media_id):
         access_token = get_access_token()
         url = f"{base_url}/games"
         data = (
-            "fields name,cover.image_id,artworks.image_id,"
+            "fields name,cover.image_id,artworks.image_id,screenshots.image_id,"
             "url,summary,game_type,first_release_date,total_rating,total_rating_count,"
             "genres.name,themes.name,platforms.name,involved_companies.company.name,"
             "parent_game.name,parent_game.cover.image_id,"
@@ -329,6 +329,7 @@ def game(media_id):
             "title": response["name"],
             "max_progress": None,
             "image": get_image_url(response),
+            "gallery": get_gallery(response),
             "synopsis": response.get("summary", "No synopsis available."),
             "genres": get_list(response, "genres"),
             "score": get_score(response),
@@ -365,6 +366,32 @@ def get_image_url(response):
         return f"https://images.igdb.com/igdb/image/upload/t_original/{response['cover']['image_id']}.jpg"
     except KeyError:
         return settings.IMG_NONE
+
+
+# Max number of gallery images shown on the media details page
+GALLERY_LIMIT = 15
+
+
+def get_gallery(response):
+    """Return screenshot/artwork images for the game gallery.
+
+    Screenshots come first (in-game captures), then promotional artworks.
+    Images are hotlinked directly from the IGDB CDN, so no bandwidth is
+    spent server-side.
+    """
+    base = "https://images.igdb.com/igdb/image/upload"
+    gallery = []
+    for key in ("screenshots", "artworks"):
+        for entry in response.get(key, []):
+            image_id = entry.get("image_id")
+            if image_id:
+                gallery.append(
+                    {
+                        "thumb": f"{base}/t_720p/{image_id}.jpg",
+                        "full": f"{base}/t_1080p/{image_id}.jpg",
+                    },
+                )
+    return gallery[:GALLERY_LIMIT]
 
 
 def get_game_type(game_type_id):

@@ -719,3 +719,56 @@ class Metadata(TestCase):
             hardcover.handle_error(error)
 
         self.assertEqual(cm.exception.provider, Sources.HARDCOVER.value)
+
+
+class Gallery(TestCase):
+    """Test the screenshot/backdrop gallery builders (no network)."""
+
+    def test_igdb_gallery_screenshots_then_artworks(self):
+        """Screenshots come before artworks, both hotlinked from the CDN."""
+        response = {
+            "screenshots": [{"image_id": "sc1"}, {"image_id": "sc2"}],
+            "artworks": [{"image_id": "art1"}],
+        }
+        gallery = igdb.get_gallery(response)
+
+        self.assertEqual(len(gallery), 3)
+        self.assertEqual(
+            gallery[0],
+            {
+                "thumb": "https://images.igdb.com/igdb/image/upload/t_720p/sc1.jpg",
+                "full": "https://images.igdb.com/igdb/image/upload/t_1080p/sc1.jpg",
+            },
+        )
+        # artwork sorts after the screenshots
+        self.assertIn("art1", gallery[2]["full"])
+
+    def test_igdb_gallery_missing_and_limit(self):
+        """No image keys yields an empty list; output is capped at the limit."""
+        self.assertEqual(igdb.get_gallery({}), [])
+
+        response = {
+            "screenshots": [
+                {"image_id": f"s{i}"} for i in range(igdb.GALLERY_LIMIT + 5)
+            ],
+        }
+        self.assertEqual(len(igdb.get_gallery(response)), igdb.GALLERY_LIMIT)
+
+    def test_tmdb_gallery_backdrops(self):
+        """Backdrops become thumb/full CDN URLs; missing images -> empty."""
+        response = {
+            "images": {
+                "backdrops": [{"file_path": "/a.jpg"}, {"file_path": "/b.jpg"}],
+            },
+        }
+        gallery = tmdb.get_gallery(response)
+
+        self.assertEqual(len(gallery), 2)
+        self.assertEqual(
+            gallery[0],
+            {
+                "thumb": "https://image.tmdb.org/t/p/w780/a.jpg",
+                "full": "https://image.tmdb.org/t/p/w1280/a.jpg",
+            },
+        )
+        self.assertEqual(tmdb.get_gallery({}), [])

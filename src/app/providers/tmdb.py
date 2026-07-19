@@ -158,10 +158,18 @@ def movie(media_id):
 
     if data is None:
         url = f"{base_url}/movie/{media_id}"
-        appends = ["recommendations", "external_ids", "credits", "watch/providers"]
+        appends = [
+            "recommendations",
+            "external_ids",
+            "credits",
+            "watch/providers",
+            "images",
+        ]
         params = {
             **base_params,
             "append_to_response": ",".join(appends),
+            # Prefer textless backdrops (language-agnostic) for the gallery
+            "include_image_language": "null,en",
         }
 
         try:
@@ -217,6 +225,7 @@ def movie(media_id):
             "title": response["title"],
             "max_progress": 1,
             "image": get_image_url(response["poster_path"]),
+            "gallery": get_gallery(response),
             "synopsis": get_synopsis(response["overview"]),
             "genres": get_genres(response["genres"]),
             "score": get_score(response["vote_average"]),
@@ -286,7 +295,7 @@ def enrich_season_with_tv_data(season_data, tv_data, media_id, season_number):
 def fetch_and_cache_seasons(media_id, season_numbers, tv_data):
     """Fetch uncached seasons from API and cache them."""
     url = f"{base_url}/tv/{media_id}"
-    base_append = "recommendations,external_ids,watch/providers"
+    base_append = "recommendations,external_ids,watch/providers,images"
     max_seasons_per_request = 8
     fetched_tv_data = tv_data
     result_data = {}
@@ -303,6 +312,8 @@ def fetch_and_cache_seasons(media_id, season_numbers, tv_data):
         params = {
             **base_params,
             "append_to_response": f"{base_append},{append_text}",
+            # Prefer textless backdrops (language-agnostic) for the gallery
+            "include_image_language": "null,en",
         }
 
         try:
@@ -390,7 +401,9 @@ def tv(media_id):
         url = f"{base_url}/tv/{media_id}"
         params = {
             **base_params,
-            "append_to_response": "recommendations,external_ids,watch/providers",
+            "append_to_response": "recommendations,external_ids,watch/providers,images",
+            # Prefer textless backdrops (language-agnostic) for the gallery
+            "include_image_language": "null,en",
         }
 
         try:
@@ -422,6 +435,7 @@ def process_tv(response):
         "title": response["name"],
         "max_progress": num_episodes,
         "image": get_image_url(response["poster_path"]),
+        "gallery": get_gallery(response),
         "synopsis": get_synopsis(response["overview"]),
         "genres": get_genres(response["genres"]),
         "score": get_score(response["vote_average"]),
@@ -513,6 +527,31 @@ def get_image_url(path):
     if path:
         return f"https://image.tmdb.org/t/p/w500{path}"
     return settings.IMG_NONE
+
+
+# Max number of gallery images shown on the media details page
+GALLERY_LIMIT = 15
+
+
+def get_gallery(response):
+    """Return backdrop images for the media gallery.
+
+    Backdrops are hotlinked directly from the TMDB CDN, so no bandwidth is
+    spent server-side. Missing when the ``images`` append wasn't requested.
+    """
+    base = "https://image.tmdb.org/t/p"
+    backdrops = response.get("images", {}).get("backdrops", [])
+    gallery = []
+    for backdrop in backdrops[:GALLERY_LIMIT]:
+        path = backdrop.get("file_path")
+        if path:
+            gallery.append(
+                {
+                    "thumb": f"{base}/w780{path}",
+                    "full": f"{base}/w1280{path}",
+                },
+            )
+    return gallery
 
 
 def get_title(response):
