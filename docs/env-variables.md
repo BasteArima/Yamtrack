@@ -12,11 +12,16 @@ This page outlines the environment variables used in the YamTrack project.
 | `MAL_API`       | MyAnimeList API key for anime and manga. A default key is provided.                                                                                                                                                                                   |
 | `MAL_NSFW`      | Default to `False`. Set to `True` to include adult content in anime and manga searches from MyAnimeList.                                                                                                                                              |
 | `MU_NSFW`       | Default to `False`. Set to `True` to include adult content in manga searches from MangaUpdates.                                                                                                                                                       |
+| `ANILIST_NSFW`  | Default to `False`. Set to `True` to include adult content in anime and manga searches from AniList.                                                                                                                                                  |
 | `IGDB_ID`       | IGDB API key for games. A default key is provided, but it's recommended to get your own as it has a low rate limit.                                                                                                                                   |
 | `IGDB_SECRET`   | IGDB API secret for games. A default value is provided, but it's recommended to get your own as it has a low rate limit.                                                                                                                              |
 | `IGDB_NSFW`     | Default to `False`. Set to `True` to include adult content in game searches.                                                                                                                                                                          |
 | `HARDCOVER_API` | Hardcover API key for books. A default key is provided, but it's recommended to get your own as it has a low rate limit. Custom values must include the `Bearer ` prefix.                                                                              |
 | `COMICVINE_API` | ComicVine API key for comics. A default key is provided, but it's recommended to get your own as it has a low rate limit.                                                                                                                             |
+
+!!! warning "AniList"
+
+    AniList allows its data to be used in self-hosted instances, but not in instances open to the public. Don't offer AniList as a source on an instance anyone can sign up to.
 
 ## Media Import
 
@@ -53,6 +58,30 @@ See [media-imports](media-imports.md).
 | `SOCIALACCOUNT_ONLY`            | Default to `False`. Set to `True` to disable local authentication when using social authentication only.                                                              |
 | `REDIRECT_LOGIN_TO_SSO`         | Default to `False`. Set to `True` to automatically redirect (using JavaScript) to the SSO provider when there's only one available. Useful for single sign-on setups. |
 | `YAMTRACK_AUTO_LOGIN_USERNAME`  | Default to `None`, which disables this feature. Specify a username to automatically login with the selected user. The user needs to be existing and active.           |
+| `YAMTRACK_INTERNAL_PORT`        | ADVANCED. Port nginx listens on inside the container. Default to `8000`. Only needed when `8000` is already taken, typically when the container shares another service's network namespace (e.g. `network_mode: service:gluetun`). See the example below. |
+
+### Example: sharing a network namespace (e.g. gluetun)
+
+When a container joins another service's network namespace via
+`network_mode: service:<name>`, it can no longer publish its own `ports:` — it
+must instead listen on a port that is free inside that namespace. Set
+`YAMTRACK_INTERNAL_PORT` to change what nginx listens on:
+
+```yaml
+services:
+  yamtrack:
+    image: ghcr.io/fuzzygrim/yamtrack
+    environment:
+      # ... the rest of the Yamtrack variables
+      - YAMTRACK_INTERNAL_PORT=9117
+    network_mode: service:gluetun
+    depends_on:
+      - gluetun
+
+  gluetun:
+    ports:
+      - "9117:9117"
+```
 
 ## Celery Health Check
 
@@ -62,15 +91,24 @@ See [media-imports](media-imports.md).
 
 ## PostgreSQL Environment Variables (YamTrack Container)
 
-| Name          | Notes                                                                                                    |
-| ------------- | -------------------------------------------------------------------------------------------------------- |
-| `DB_HOST`     | The hostname or IP address of the PostgreSQL server. If not set, SQLite is used as the default database. |
-| `DB_PORT`     | The port number on which the PostgreSQL server is listening.                                             |
-| `DB_NAME`     | The name of the database to connect to.                                                                  |
-| `DB_USER`     | The username used to authenticate with the PostgreSQL server.                                            |
-| `DB_PASSWORD` | The password for the specified user.                                                                     |
+| Name               | Notes                                                                                                                                         |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DB_HOST`          | The hostname or IP address of the PostgreSQL server, or the directory of its Unix socket. If omitted, SQLite is used as the default database. |
+| `DB_PORT`          | The port number on which the PostgreSQL server is listening. Optional; if omitted, the PostgreSQL client's default is used.                   |
+| `DB_NAME`          | The name of the database to connect to. Required when using PostgreSQL.                                                                       |
+| `DB_USER`          | The username used to authenticate with the PostgreSQL server. Optional; if omitted, the OS user running the process is used.                  |
+| `DB_PASSWORD`      | The password for the specified user. Optional; not needed for local Unix socket connections using peer/ident authentication.                  |
+| `DB_POOL_MIN_SIZE` | Default to `1`. Minimum number of connections each process keeps open in its connection pool.                                                 |
+| `DB_POOL_MAX_SIZE` | Default to `4`. Maximum number of connections each process can open in its connection pool.                                                   |
 
 **Note:** Check the example `docker-compose.postgres.yml` in the root directory of the repo for a PostgreSQL configuration example.
+
+**Connecting via a local Unix socket:** set `DB_HOST` to the directory containing the PostgreSQL socket (e.g. `DB_HOST=/run/postgresql`). `DB_PORT`, `DB_USER`, and `DB_PASSWORD` can be omitted in this setup, in which case the PostgreSQL client defaults are used (port 5432 and the OS user running Yamtrack), so only `DB_NAME` must be set:
+
+```bash
+DB_HOST=/run/postgresql
+DB_NAME=yamtrack
+```
 
 ### External PostgreSQL database with SSL (YamTrack Container)
 

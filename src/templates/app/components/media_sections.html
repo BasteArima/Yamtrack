@@ -1,4 +1,5 @@
 {% load app_tags %}
+{% load i18n %}
 
 {% if not sections %}
   <div class="flex flex-col items-center justify-center py-16 bg-[#2a2f35] rounded-lg">
@@ -6,14 +7,16 @@
       <div class="bg-[#39404b] rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
         {% include "app/icons/edit.svg" with classes="w-8 h-8 text-gray-400" %}
       </div>
-      <h3 class="text-xl font-semibold mb-2">No {{ media_type|media_type_readable_plural }} Tracked Yet</h3>
+      <h3 class="text-xl font-semibold mb-2">{% blocktrans with media_type_label=media_type|media_type_readable %}No {{ media_type_label }} Tracked Yet{% endblocktrans %}</h3>
       {% if request.user == target_user %}
         <p class="text-gray-400 mb-6">
-          Start tracking your {{ media_type_plural }} to keep a record of what you've {{ media_type|media_past_verb }}.
+          {% blocktrans trimmed with media_type_plural=media_type|media_type_readable_plural past_verb=media_type|media_past_verb %}
+            Start tracking your {{ media_type_plural }} to keep a record of what you've {{ past_verb }}.
+          {% endblocktrans %}
         </p>
         <a href="{{ media_type|sample_search }}"
            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
-          Browse {{ media_type|media_type_readable_plural }}
+          {% blocktrans with media_type=media_type|media_type_readable_plural %}Browse {{ media_type }}{% endblocktrans %}
         </a>
       {% endif %}
     </div>
@@ -30,13 +33,13 @@
       <thead class="text-left text-gray-400 text-sm">
         <tr>
           <th class="p-2 w-15"></th>
-          <th class="p-2 pe-8 w-2/5">Title</th>
-          <th class="p-2 text-center">Score</th>
-          {% if media_type != MediaTypes.MOVIE.value %}<th class="p-2 text-center">Progress</th>{% endif %}
-          {% if media_type == MediaTypes.TV.value %}<th class="p-2 text-center">Last Watched</th>{% endif %}
-          <th class="p-2 text-center">Status</th>
-          <th class="p-2 text-center">Start Date</th>
-          <th class="p-2 text-center">End Date</th>
+          <th class="p-2 pe-8 w-2/5">{% trans "Title" %}</th>
+          <th class="p-2 text-center">{% trans "Score" %}</th>
+          {% if media_type != MediaTypes.MOVIE.value %}<th class="p-2 text-center">{% trans "Progress" %}</th>{% endif %}
+          {% if media_type == MediaTypes.TV.value %}<th class="p-2 text-center">{% trans "Last Watched" %}</th>{% endif %}
+          <th class="p-2 text-center">{% trans "Status" %}</th>
+          <th class="p-2 text-center">{% trans "Start Date" %}</th>
+          <th class="p-2 text-center">{% trans "End Date" %}</th>
         </tr>
       </thead>
       {% for section in sections %}

@@ -1,5 +1,10 @@
+# Both stages must use the same Python version, otherwise the virtualenv copied
+# from the builder ends up in a site-packages path the runtime Python ignores.
+ARG PYTHON_VERSION=3.12
+ARG ALPINE_VERSION=3.23
+
 # --- Builder stage: build the virtualenv with uv ---
-FROM ghcr.io/astral-sh/uv:python3.12-alpine3.23 AS builder
+FROM ghcr.io/astral-sh/uv:python${PYTHON_VERSION}-alpine${ALPINE_VERSION} AS builder
 
 # Disable development dependencies
 ENV UV_NO_DEV=1
@@ -16,7 +21,7 @@ COPY ./uv.lock ./uv.lock
 RUN uv sync --locked
 
 # --- Final stage: minimal runtime image ---
-FROM python:3.12-alpine3.23
+FROM python:${PYTHON_VERSION}-alpine${ALPINE_VERSION}
 
 # https://stackoverflow.com/questions/58701233/docker-logs-erroneously-appears-empty-until-container-stops
 ENV PYTHONUNBUFFERED=1
@@ -30,14 +35,13 @@ ENV PATH="/yamtrack/.venv/bin:$PATH"
 
 WORKDIR /yamtrack
 
-COPY ./entrypoint.sh /entrypoint.sh
+COPY --chmod=755 ./entrypoint.sh /entrypoint.sh
 COPY ./supervisord.conf /etc/supervisord.conf
 COPY ./nginx.conf /etc/nginx/nginx.conf
 # Generate a copy of the nginx config with IPv6 support.
 RUN sed 's/listen 8000;/listen 8000; listen [::]:8000;/' /etc/nginx/nginx.conf > /etc/nginx/nginx.ipv6.conf
 
-RUN apk add --no-cache nginx shadow \
-    && chmod +x /entrypoint.sh \
+RUN apk add --no-cache nginx shadow gettext \
     # create user abc for later PUID/PGID mapping
     && useradd -U -M -s /bin/sh abc \
     # Create required nginx directories and set permissions
@@ -49,11 +53,15 @@ COPY --from=builder /yamtrack/.venv /yamtrack/.venv
 
 # Django app
 COPY src ./
-RUN python manage.py collectstatic --noinput
+# Skip .venv: dependencies ship compiled catalogs, and running msgfmt over all of
+# them hangs arm64 builds under QEMU
+RUN python manage.py collectstatic --noinput \
+  && python manage.py compilemessages --ignore=.venv
 
+# Default nginx listen port; overridden at runtime with YAMTRACK_INTERNAL_PORT
 EXPOSE 8000
 
 CMD ["/entrypoint.sh"]
 
 HEALTHCHECK --interval=45s --timeout=15s --start-period=30s --retries=5 \
-    CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:8000/health/ || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:${YAMTRACK_INTERNAL_PORT:-8000}/health/ || exit 1

@@ -2,6 +2,8 @@ import logging
 
 from celery import shared_task
 from django.contrib.auth import get_user_model
+from django.utils import translation
+from django.utils.translation import gettext as _
 
 import events
 from app.mixins import disable_fetch_releases
@@ -43,9 +45,11 @@ def format_import_message(imported_counts, warning_messages=None):
     parts = [p for p in parts if p is not None]
 
     if not parts:
-        info_message = "No media was imported."
+        info_message = _("No media was imported.")
     else:
-        info_message = f"Imported {helpers.join_with_commas_and(parts)}."
+        info_message = _("Imported %(media_list)s.") % {
+            "media_list": helpers.join_with_commas_and(parts)
+        }
 
     if warning_messages:
         return f"{info_message} {ERROR_TITLE} {warning_messages}"
@@ -63,33 +67,39 @@ def import_media(
     """Handle the import process for different media services."""
     user = get_user_model().objects.get(id=user_id)
 
-    with disable_fetch_releases():
-        if oauth_username is None:
-            imported_counts, warnings = importer_func(
-                identifier,
-                user,
-                mode,
-                **kwargs,
-            )
-        else:
-            imported_counts, warnings = importer_func(
-                identifier,
-                user,
-                mode,
-                username=oauth_username,
-                **kwargs,
-            )
+    # Celery tasks run outside a request, so build the warnings, errors and
+    # summary in the user's language instead of LANGUAGE_CODE
+    with translation.override(user.language):
+        with disable_fetch_releases():
+            if oauth_username is None:
+                imported_counts, warnings = importer_func(
+                    identifier,
+                    user,
+                    mode,
+                    **kwargs,
+                )
+            else:
+                imported_counts, warnings = importer_func(
+                    identifier,
+                    user,
+                    mode,
+                    username=oauth_username,
+                    **kwargs,
+                )
 
-    events.tasks.reload_calendar.delay()
+        events.tasks.reload_calendar.delay()
 
-    return format_import_message(imported_counts, warnings)
+        return format_import_message(imported_counts, warnings)
 
 
 @shared_task(name="Import from Trakt")
-def import_trakt(user_id, mode, token=None, username=None, redirect_uri=None):
+def import_trakt(
+    user_id, mode, token=None, file=None, username=None, redirect_uri=None
+):
     """Celery task for importing media data from Trakt.
 
-    Can import using either OAuth (token provided) or public username.
+    Can import using OAuth (token provided), public username, or the contents of
+    an export archive downloaded from the Trakt website.
     """
     return import_media(
         trakt.importer,
@@ -98,6 +108,7 @@ def import_trakt(user_id, mode, token=None, username=None, redirect_uri=None):
         mode,
         username,
         redirect_uri=redirect_uri,
+        file=file,
     )
 
 

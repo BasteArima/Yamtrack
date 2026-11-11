@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load app_tags %}
+{% load i18n %}
 
 {% block extra_head %}
   {% if form %}{{ form.media.css }}{% endif %}
@@ -11,6 +12,9 @@
 {% endblock title %}
 
 {% block content %}
+  {% trans "Date Added" as date_added_label %}
+  {% trans "Title" as title_label %}
+  {% trans "Media Type" as media_type_label %}
   <div class="flex items-center justify-between mb-6"
        x-data="{ showModal: false }">
     <div>
@@ -26,9 +30,17 @@
             {% endfor %}
           </div>
           <span class="text-sm text-gray-400">
-            {{ collaborators_count }} collaborator{{ collaborators_count|pluralize }}
+            {% blocktrans trimmed count counter=collaborators_count %}
+              {{ counter }} collaborator
+            {% plural %}
+              {{ counter }} collaborators
+            {% endblocktrans %}
             <span class="mx-2">•</span>
-            {{ items_count }} item{{ items_count|pluralize }}
+            {% blocktrans trimmed count item_count=items_count %}
+              {{ item_count }} item
+            {% plural %}
+              {{ item_count }} items
+            {% endblocktrans %}
           </span>
         </div>
       </div>
@@ -37,21 +49,14 @@
       <button @click="showModal = true"
               class="px-4 py-2 bg-[#39404b] hover:bg-[#454d5a] rounded-md transition-colors flex items-center gap-2 text-sm group cursor-pointer">
         {% include "app/icons/horizontal-sliders.svg" with classes="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" %}
-        <span>Edit List</span>
+        <span>{% trans "Edit List" %}</span>
       </button>
       {% include "lists/components/list_form.html" %}
     {% endif %}
   </div>
 
-  <div x-data="{ sort: '{{ current_sort|escapejs }}', type: '{{ request.GET.type|default:'all'|escapejs }}', status: '{{ current_status|escapejs }}', query: '{{ request.GET.q|default:''|escapejs }}', mediaTypeLabels: {
-    {% for media_type in media_types %}'{{ media_type }}': '{{ media_type|media_type_readable_plural }}',{% endfor %}
-    'all': 'All Types' }, statusLabels: {
-    {% for value, label in status_choices %}
-      '{{ value }}': '{{ label }}'
-      {% if not forloop.last %},{% endif %}
-
-    {% endfor %}
-    }, getMediaTypeLabel() { return this.mediaTypeLabels[this.type] || this.type; } }">
+  {% trans "All Types" as all_types_label %}
+  <div x-data="{ sort: '{{ current_sort|escapejs }}', type: '{{ request.GET.type|default:'all'|escapejs }}', status: '{{ current_status|escapejs }}', query: '{{ request.GET.q|default:''|escapejs }}', mediaTypeLabels: { {% for media_type in media_types %}'{{ media_type }}': '{{ media_type|media_type_readable_plural }}',{% endfor %} 'all': '{{ all_types_label|escapejs }}' }, statusLabels: { {% for value, label in status_choices %} '{{ value }}': '{{ label }}' {% if not forloop.last %},{% endif %}  {% endfor %} }, getMediaTypeLabel() { return this.mediaTypeLabels[this.type] || this.type; } }">
 
     <!-- Form to manage state -->
     <form id="filter-form" class="hidden">
@@ -65,7 +70,7 @@
       {# Search #}
       <div class="relative flex-1">
         <input id="search-input"
-               placeholder="Search in collection..."
+               placeholder="{% trans 'Search in collection...' %}"
                class="w-full py-2 pl-10 pr-4 bg-[#39404b] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#4a9eff] appearance-none"
                type="text"
                x-model="query"
@@ -82,7 +87,7 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-2 flex-shrink-0">
+      <div class="flex items-center gap-2 shrink-0">
         {# Filter by Status #}
         <div class="relative" x-data="{ open: false }">
           <button class="h-10 flex items-center gap-2 px-4 bg-[#39404b] rounded-md hover:bg-[#454d5a] transition-colors cursor-pointer"
@@ -165,7 +170,7 @@
                     class="block w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer"
                     :class="type === 'all' ? 'bg-indigo-600 text-white font-medium' : 'text-gray-300 hover:bg-[#454d5a] hover:text-white'"
                     @click="type = 'all'; open = false"
-                    type="button">All</button>
+                    type="button">{% trans "All" %}</button>
             {% for media_type in media_types %}
               <button hx-get="{% url 'list_detail' target_user.username custom_list.id %}"
                       {% if items %}hx-target="#items-grid"{% else %}hx-target="this" hx-swap="none"{% endif %}
@@ -186,7 +191,7 @@
                   type="button">
             {% include "app/icons/arrows-up-down.svg" with classes="w-4 h-4" %}
             <span class="text-sm"
-                  x-text="sort === 'date_added' ? 'Date Added' : (sort === 'title' ? 'Title' : 'Media Type')"></span>
+                  x-text="sort === 'date_added' ? '{{ date_added_label|escapejs }}' : (sort === 'title' ? '{{ title_label|escapejs }}' : '{{ media_type_label|escapejs }}')"></span>
             {% include "app/icons/chevron-down.svg" with classes="w-4 h-4" %}
           </button>
 
@@ -222,11 +227,11 @@
           <div class="bg-[#39404b] rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
             {% include "app/icons/list-add.svg" with classes="w-8 h-8 text-gray-400" %}
           </div>
-          <h3 class="text-xl font-semibold mb-2">No items in this list yet</h3>
-          <p class="text-gray-400 mb-6">Start adding your favorite media to build your collection</p>
+          <h3 class="text-xl font-semibold mb-2">{% trans "No items in this list yet" %}</h3>
+          <p class="text-gray-400 mb-6">{% trans "Start adding your favorite media to build your collection" %}</p>
           <div class="pt-4">
             <a href="{{ 'tv'|sample_search }}"
-               class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">Browse Media</a>
+               class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">{% trans "Browse Media" %}</a>
           </div>
         </div>
       </div>
@@ -252,7 +257,7 @@
   {% if request.user != target_user %}
     <ul class="space-y-1 mb-6 {% if request.user.is_authenticated %}border-t border-[#2c3136] pt-4{% endif %}">
       <li>
-        <span class="flex font-bold items-center space-x-3 px-4 py-2 rounded-md transition-colors duration-200 text-sm text-white">{{ target_user.username }}'s Media:</span>
+        <span class="flex font-bold items-center space-x-3 px-4 py-2 rounded-md transition-colors duration-200 text-sm text-white">{% blocktrans with username=target_user.username %}{{ username }}'s Media:{% endblocktrans %}</span>
       </li>
       {% get_sidebar_media_types target_user as sidebar_media_types %}
       {% for item in sidebar_media_types %}
@@ -268,7 +273,7 @@
         <a href="{% url 'lists' target_user.username %}"
            class="flex items-center space-x-3 px-4 py-2 rounded-md transition-colors duration-200 text-sm text-white bg-[#2c3136]">
           {% include "app/icons/folder-plus.svg" with classes="w-5 h-5 text-indigo-400" %}
-          <span>Lists</span>
+          <span>{% trans "Lists" %}</span>
         </a>
       </li>
     </ul>
@@ -302,7 +307,7 @@
             <polyline points="10 17 15 12 10 7"></polyline>
             <line x1="15" x2="3" y1="12" y2="12"></line>
           </svg>
-          Sign In
+          {% trans "Sign In" %}
         </a>
       </div>
     </div>

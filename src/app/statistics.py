@@ -1,7 +1,4 @@
-import calendar
 import datetime
-import heapq
-import itertools
 import logging
 from collections import defaultdict
 
@@ -12,7 +9,10 @@ from django.db.models import (
     Prefetch,
     Q,
 )
-from django.utils import timezone
+from django.utils import formats, timezone
+from django.utils.dateparse import parse_date
+from django.utils.dates import WEEKDAYS, WEEKDAYS_ABBR
+from django.utils.translation import npgettext
 
 from app import config
 from app.models import TV, BasicMedia, Episode, MediaManager, MediaTypes, Season, Status
@@ -20,6 +20,36 @@ from app.templatetags import app_tags
 from users.models import WeekStartDayChoices
 
 logger = logging.getLogger(__name__)
+
+
+def parse_activity_date_range(request):
+    """Parse ``start-date``/``end-date`` params into an aware datetime range.
+
+    Defaults to the last year. ``all`` for both means no range (``None``).
+    """
+    timeformat = "%Y-%m-%d"
+    today = timezone.localdate()
+    # relativedelta clamps Feb 29 to Feb 28 instead of raising ValueError.
+    one_year_ago = today - relativedelta(years=1)
+
+    start_date_str = request.GET.get("start-date") or one_year_ago.strftime(timeformat)
+    end_date_str = request.GET.get("end-date") or today.strftime(timeformat)
+
+    if start_date_str == "all" and end_date_str == "all":
+        return None, None
+
+    start_date = parse_date(start_date_str)
+    end_date = parse_date(end_date_str)
+
+    if start_date and end_date:
+        start_date = timezone.make_aware(
+            datetime.datetime.combine(start_date, datetime.datetime.min.time()),
+        )
+        end_date = timezone.make_aware(
+            datetime.datetime.combine(end_date, datetime.datetime.max.time()),
+        )
+
+    return start_date, end_date
 
 
 def get_user_media(user, start_date, end_date):
@@ -190,6 +220,14 @@ def get_status_distribution(user_media):
     }
 
 
+def get_status_total(status_distribution, status):
+    """Return the total count of a single status across all media types."""
+    for dataset in status_distribution["datasets"]:
+        if dataset["label"] == status:
+            return dataset["total"]
+    return 0
+
+
 def get_status_pie_chart_data(status_distribution):
     """Get status distribution as a pie chart."""
     # Format for Chart.js pie chart
@@ -218,32 +256,44 @@ def get_status_pie_chart_data(status_distribution):
     return chart_data
 
 
+def _top_rated_group_key(media_type, media):
+    """Return the key used to dedupe repeated entries of the same item.
+
+    A single item (e.g. a rewatched movie) can have multiple scored rows, so
+    without this they'd surface as separate "duplicate" entries for what a
+    user perceives as a single item. Seasons and their parent TV show are
+    kept separate since they represent distinct ratings.
+    """
+    return (media_type, media.item_id)
+
+
 def get_score_distribution(user_media):
     """Get score distribution for each media type within date range."""
     distribution = {}
     total_scored = 0
     total_score_sum = 0
 
-    top_rated = []
-    top_rated_count = 14
-    counter = itertools.count()  # Ensures stable sorting for equal scores
+    top_rated_by_key = {}
     score_range = range(11)
 
     for media_type, media_list in user_media.items():
         score_counts = dict.fromkeys(score_range, 0)
-        scored_media = media_list.exclude(score__isnull=True).select_related("item")
+        # Only item + score are read here, so drop any prefetch (e.g. the TV
+        # seasons/episodes graph) that get_user_media attached — surviving
+        # top-rated rows are re-fetched with the right prefetch afterwards.
+        scored_media = (
+            media_list.exclude(score__isnull=True)
+            .select_related("item")
+            .prefetch_related(None)
+        )
 
         for media in scored_media:
-            if len(top_rated) < top_rated_count:
-                heapq.heappush(
-                    top_rated,
-                    (float(media.score), next(counter), media),
-                )
-            else:
-                heapq.heappushpop(
-                    top_rated,
-                    (float(media.score), next(counter), media),
-                )
+            key = _top_rated_group_key(media_type, media)
+            existing = top_rated_by_key.get(key)
+            # Keep the score from the most recently created entry so repeated
+            # or imported ratings for the same item aren't all listed.
+            if existing is None or media.created_at > existing.created_at:
+                top_rated_by_key[key] = media
 
             binned_score = int(media.score)
             score_counts[binned_score] += 1
@@ -256,9 +306,11 @@ def get_score_distribution(user_media):
         round(total_score_sum / total_scored, 2) if total_scored > 0 else None
     )
 
-    top_rated_media = [
-        media for _, _, media in sorted(top_rated, key=lambda x: (-x[0], x[1]))
-    ]
+    top_rated_count = 14
+    top_rated_media = sorted(
+        top_rated_by_key.values(),
+        key=lambda media: (-float(media.score), -media.created_at.timestamp()),
+    )[:top_rated_count]
 
     top_rated_media = _annotate_top_rated_media(top_rated_media)
 
@@ -319,86 +371,109 @@ def get_status_color(status):
         return "rgba(201, 203, 207)"
 
 
-def get_timeline(user_media):
-    """Build a timeline of media consumption organized by month-year."""
-    timeline = defaultdict(list)
+def _consumed_value(media_type, queryset, item_count):
+    """Return the consumed amount for one media type.
 
-    # Process each media type
+    The amount is counted in the media type's sub-unit (episodes, chapters,
+    pages, ...), in hours for games, or in whole items for movies. Returns
+    ``None`` when nothing has been consumed. TV is excluded by the caller: its
+    episodes are tallied through seasons and its ``progress`` is a computed
+    property rather than an aggregatable column.
+    """
+    if media_type == MediaTypes.SEASON.value:
+        # ``episodes`` are prefetched in get_user_media, so this reuses the
+        # cache instead of issuing a query per season.
+        value = sum(len(season.episodes.all()) for season in queryset)
+    elif media_type == MediaTypes.MOVIE.value:
+        # Whole movies are counted; reuse the count get_user_media already ran.
+        value = item_count
+    else:
+        value = queryset.aggregate(total=models.Sum("progress"))["total"] or 0
+
+    if media_type == MediaTypes.GAME.value:
+        # ``progress`` is stored in minutes for games.
+        value = round(value / 60)
+
+    return value or None
+
+
+# Each media type has its own whole phrase so translations can agree in gender
+# and number. Season rows aggregate TV episode watches, so they read as "TV".
+CONSUMPTION_DESCRIPTORS = {
+    MediaTypes.SEASON.value: lambda n: npgettext(
+        "consumption statistic", "TV episode watched", "TV episodes watched", n
+    ),
+    MediaTypes.EPISODE.value: lambda n: npgettext(
+        "consumption statistic", "Episode watched", "Episodes watched", n
+    ),
+    MediaTypes.MOVIE.value: lambda n: npgettext(
+        "consumption statistic", "Movie watched", "Movies watched", n
+    ),
+    MediaTypes.ANIME.value: lambda n: npgettext(
+        "consumption statistic", "Anime episode watched", "Anime episodes watched", n
+    ),
+    MediaTypes.MANGA.value: lambda n: npgettext(
+        "consumption statistic", "Manga chapter read", "Manga chapters read", n
+    ),
+    MediaTypes.GAME.value: lambda n: npgettext(
+        "consumption statistic", "Game hour played", "Game hours played", n
+    ),
+    MediaTypes.BOOK.value: lambda n: npgettext(
+        "consumption statistic", "Book page read", "Book pages read", n
+    ),
+    MediaTypes.COMIC.value: lambda n: npgettext(
+        "consumption statistic", "Comic issue read", "Comic issues read", n
+    ),
+    MediaTypes.BOARDGAME.value: lambda n: npgettext(
+        "consumption statistic", "Boardgame play", "Boardgame plays", n
+    ),
+}
+
+
+def _consumption_descriptor(media_type, value):
+    """Build a descriptor like "TV episodes watched" or "Movies watched"."""
+    return CONSUMPTION_DESCRIPTORS[media_type](value)
+
+
+def get_consumption_stats(user_media, media_count):
+    """Aggregate how much of each media type the user has consumed.
+
+    Returns one entry per media type with a real total (episodes watched,
+    chapters/pages read, hours played, ...), ready for a card grid. Each
+    descriptor names the media type so, e.g., TV and anime episodes read
+    distinctly. ``media_count`` supplies per-type counts already computed by
+    get_user_media so movies aren't counted a second time.
+    """
+    results = []
     for media_type, queryset in user_media.items():
         if media_type == MediaTypes.TV.value:
             continue
-        for media in queryset:
-            local_start_date = timezone.localdate(media.start_date)
-            local_end_date = timezone.localdate(media.end_date)
+        value = _consumed_value(media_type, queryset, media_count[media_type])
+        if value is None:
+            continue
+        results.append(
+            {
+                "media_type": media_type,
+                "value": value,
+                "descriptor": _consumption_descriptor(media_type, value),
+                "color": config.get_stats_color(media_type),
+            },
+        )
 
-            if media.start_date and media.end_date:
-                # add media to all months between start and end
-                current_date = local_start_date
-                while current_date <= local_end_date:
-                    year = current_date.year
-                    month = current_date.month
-                    month_name = calendar.month_name[month]
-                    month_year = f"{month_name} {year}"
-
-                    timeline[month_year].append(media)
-
-                    # Move to next month
-                    current_date += relativedelta(months=1)
-                    current_date = current_date.replace(day=1)
-            elif media.start_date:
-                # If only start date, add to the start month
-                year = local_start_date.year
-                month = local_start_date.month
-                month_name = calendar.month_name[month]
-                month_year = f"{month_name} {year}"
-
-                timeline[month_year].append(media)
-            elif media.end_date:
-                # If only end date, add to the end month
-                year = local_end_date.year
-                month = local_end_date.month
-                month_name = calendar.month_name[month]
-                month_year = f"{month_name} {year}"
-
-                timeline[month_year].append(media)
-
-    # Convert to sorted dictionary with media sorted by start date
-    # Create a list sorted by year and month in reverse order
-    sorted_items = []
-    for month_year, media_list in timeline.items():
-        month_name, year_str = month_year.split()
-        year = int(year_str)
-        month = list(calendar.month_name).index(month_name)
-        sorted_items.append((month_year, media_list, year, month))
-
-    # Sort by year and month in reverse chronological order
-    sorted_items.sort(key=lambda x: (x[2], x[3]), reverse=True)
-
-    # Create the final result dictionary
-    result = {}
-    for month_year, media_list, _, _ in sorted_items:
-        # Sort the media list using our custom sort key
-        result[month_year] = sorted(media_list, key=time_line_sort_key, reverse=True)
-    return result
-
-
-def time_line_sort_key(media):
-    """Sort media items in the timeline."""
-    if media.end_date is not None:
-        return timezone.localdate(media.end_date)
-    return timezone.localdate(media.start_date)
+    return results
 
 
 def _build_month_labels(date_range, week_start_weekday):
     """Build month labels and their corresponding week counts for the activity grid."""
     months = []
     weeks_per_month = []
-    current_month = date_range[0].strftime("%b")
+    # "M" is the translated abbreviated month name, e.g. "Jan" or "Gen"
+    current_month = formats.date_format(date_range[0], "M")
     week_count = 0
 
     for current_date in date_range:
         if current_date.weekday() == week_start_weekday:
-            month = current_date.strftime("%b")
+            month = formats.date_format(current_date, "M")
 
             if current_month != month:
                 if current_month is not None:
@@ -485,7 +560,7 @@ def get_activity_data(user, start_date, end_date):
     months, weeks_per_month = _build_month_labels(date_range, week_start_weekday)
 
     # Weekday labels depend on week start day
-    days = list(calendar.day_abbr)
+    days = [str(WEEKDAYS_ABBR[weekday]) for weekday in range(7)]
     weekday_labels = [days[6], *days[0:6]] if week_start_sunday else days
 
     return {
@@ -568,8 +643,7 @@ def calculate_day_of_week_stats(date_counts, start_date):
         if date < start_date:
             continue
         if date_counts[date] > 0:
-            day_name = date.strftime("%A")  # Get full day name
-            day_counts[day_name] += 1
+            day_counts[date.weekday()] += 1
             total_active_days += 1
 
     if not total_active_days:
@@ -579,7 +653,7 @@ def calculate_day_of_week_stats(date_counts, start_date):
     most_active_day = max(day_counts.items(), key=lambda x: x[1])
     percentage = (most_active_day[1] / total_active_days) * 100
 
-    return most_active_day[0], round(percentage)
+    return str(WEEKDAYS[most_active_day[0]]), round(percentage)
 
 
 def calculate_streaks(date_counts, end_date):

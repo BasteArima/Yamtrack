@@ -40,9 +40,11 @@ def handle_error(error):
     raise services.ProviderAPIError(Sources.MAL.value, error)
 
 
-def search(media_type, query, page):
+def search(media_type, query, page, *, show_adult_titles=True):
     """Search for media on MyAnimeList."""
-    cache_key = f"search_{Sources.MAL.value}_{media_type}_{query}_{page}"
+    cache_key = (
+        f"search_{Sources.MAL.value}_{media_type}_{query}_{page}_{show_adult_titles}"
+    )
     data = cache.get(cache_key)
 
     if data is None:
@@ -51,8 +53,9 @@ def search(media_type, query, page):
             "q": query,
             "fields": "media_type",
             "limit": settings.PER_PAGE,
+            "offset": (page - 1) * settings.PER_PAGE,
         }
-        if settings.MAL_NSFW:
+        if settings.MAL_NSFW and show_adult_titles:
             params["nsfw"] = "true"
 
         try:
@@ -80,8 +83,8 @@ def search(media_type, query, page):
 
         data = helpers.format_search_response(
             page,
-            100,
-            len(results),
+            settings.PER_PAGE,
+            settings.PER_PAGE * 3,  # MAL has no limit, we set max of 3 pages
             results,
         )
 
@@ -256,6 +259,39 @@ def get_gallery(response):
         full = large or medium
         if thumb and full:
             gallery.append({"thumb": thumb, "full": full})
+    return gallery
+
+
+def get_manga_gallery(media_id):
+    """Return the MAL alternate-cover gallery for a manga by its MAL id.
+
+    Used to enrich manga from other sources (e.g. AniList, via ``idMal``).
+    Never fatal: on any error (including a missing API key) an empty gallery
+    is returned so the section is simply hidden.
+    """
+    cache_key = f"{Sources.MAL.value}_{MediaTypes.MANGA.value}_gallery_{media_id}"
+    gallery = cache.get(cache_key)
+
+    if gallery is None:
+        try:
+            response = services.api_request(
+                Sources.MAL.value,
+                "GET",
+                f"{base_url}/manga/{media_id}",
+                params={"fields": "pictures"},
+                headers={"X-MAL-CLIENT-ID": settings.MAL_API},
+            )
+        except (
+            requests.exceptions.RequestException,
+            services.ProviderAPIError,
+            ValueError,
+        ):
+            logger.warning("Failed to fetch MAL pictures for manga %s", media_id)
+            return []
+
+        gallery = get_gallery(response)
+        cache.set(cache_key, gallery)
+
     return gallery
 
 

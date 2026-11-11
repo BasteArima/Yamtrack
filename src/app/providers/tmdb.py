@@ -5,6 +5,7 @@ import requests
 from django.conf import settings
 from django.core.cache import cache
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
 from app import helpers
 from app.models import MediaTypes, Sources
@@ -70,9 +71,11 @@ def get_external_links(external_ids, tmdb_id=None):
     return links
 
 
-def search(media_type, query, page):
+def search(media_type, query, page, *, show_adult_titles=True):
     """Search for media on TMDB."""
-    cache_key = f"search_{Sources.TMDB.value}_{media_type}_{query}_{page}"
+    cache_key = (
+        f"search_{Sources.TMDB.value}_{media_type}_{query}_{page}_{show_adult_titles}"
+    )
     data = cache.get(cache_key)
 
     if data is None:
@@ -84,7 +87,7 @@ def search(media_type, query, page):
             "page": page,
         }
 
-        if settings.TMDB_NSFW:
+        if settings.TMDB_NSFW and show_adult_titles:
             params["include_adult"] = "true"
 
         try:
@@ -104,6 +107,7 @@ def search(media_type, query, page):
                 "media_type": media_type,
                 "title": get_title(media),
                 "image": get_image_url(media["poster_path"]),
+                "release_year": get_release_year(media),
             }
             for media in response["results"]
         ]
@@ -289,6 +293,9 @@ def enrich_season_with_tv_data(season_data, tv_data, media_id, season_number):
     season_data["genres"] = tv_data["genres"]
     if season_data["synopsis"] == "No synopsis available.":
         season_data["synopsis"] = tv_data["synopsis"]
+    # seasons often have no poster of their own, use the show's instead
+    if season_data["image"] == settings.IMG_NONE:
+        season_data["image"] = tv_data["image"]
     return season_data
 
 
@@ -336,14 +343,22 @@ def fetch_and_cache_seasons(media_id, season_numbers, tv_data):
         for season_number in season_subset:
             season_key = f"season/{season_number}"
             if season_key not in response:
-                msg = (
-                    f"Season {season_number} not found in {Sources.TMDB.label} "
-                    f"with ID {media_id}"
-                )
+                msg = _(
+                    "Season %(season_number)s not found for %(provider)s "
+                    "with ID %(media_id)s",
+                ) % {
+                    "season_number": season_number,
+                    "provider": Sources.TMDB.label,
+                    "media_id": media_id,
+                }
                 not_found_response = requests.Response()
                 not_found_response.status_code = 404
                 not_found_error = type("Error", (), {"response": not_found_response})
-                raise services.ProviderAPIError(msg, error=not_found_error, details=msg)
+                raise services.ProviderAPIError(
+                    Sources.TMDB.value,
+                    error=not_found_error,
+                    details=msg,
+                )
 
             season_data = process_season(
                 response[season_key], response[f"{season_key}/watch/providers"]
@@ -563,6 +578,16 @@ def get_title(response):
         return response["name"]
 
 
+def get_release_year(response):
+    """Return the release year for the media."""
+    # tv shows have first_air_date instead of release_date
+    # when unknown date, value from response is empty string
+    date = response.get("release_date") or response.get("first_air_date")
+    if not date:
+        return None
+    return int(date[:4])
+
+
 def get_start_date(date):
     """Return the start date for the media."""
     # when unknown date, value from response is empty string
@@ -660,10 +685,14 @@ def get_related(related_medias, media_type, parent_response=None):
     """Return list of related media for the selected media."""
     related = []
     for media in related_medias:
+        poster_path = media["poster_path"]
+        if media_type == MediaTypes.SEASON.value and not poster_path:
+            poster_path = parent_response["poster_path"]
+
         data = {
             "source": Sources.TMDB.value,
             "media_type": media_type,
-            "image": get_image_url(media["poster_path"]),
+            "image": get_image_url(poster_path),
         }
         if media_type == MediaTypes.SEASON.value:
             data["media_id"] = parent_response["id"]
@@ -796,10 +825,15 @@ def episode(media_id, season_number, episode_number):
             }
 
     # Episode not found - throw ProviderAPIError
-    msg = (
-        f"Episode {episode_number} not found in season {season_number} "
-        f"for {Sources.TMDB.label} with ID {media_id}"
-    )
+    msg = _(
+        "Episode %(episode_number)s not found in season %(season_number)s "
+        "for %(provider)s with ID %(media_id)s",
+    ) % {
+        "episode_number": episode_number,
+        "season_number": season_number,
+        "provider": Sources.TMDB.label,
+        "media_id": media_id,
+    }
     # Create a new response object with 404 status
     not_found_response = requests.Response()
     not_found_response.status_code = 404
@@ -814,7 +848,7 @@ def episode(media_id, season_number, episode_number):
 
 def watch_provider_regions():
     """Return the available watch provider regions from The Movie Database."""
-    cache_key = f"{Sources.TMDB.value}_watch_provider_regions"
+    cache_key = f"{Sources.TMDB.value}_watch_provider_region_list"
     data = cache.get(cache_key)
 
     if data is None:
@@ -831,7 +865,7 @@ def watch_provider_regions():
         except requests.exceptions.HTTPError as error:
             handle_error(error)
 
-        data = [("", "Disabled")]
+        data = []
         regions = response.get("results", [])
         for region in sorted(regions, key=lambda r: r.get("english_name", "")):
             key = region.get("iso_3166_1")
@@ -843,7 +877,7 @@ def watch_provider_regions():
 
         cache.set(cache_key, data)
 
-    return data
+    return [("", _("Disabled")), *data]
 
 
 def get_changed_ids(media_type):

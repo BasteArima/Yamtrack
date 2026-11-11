@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 from django.db.models import Count, F, OuterRef, Prefetch, Q, Subquery
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_POST
 
 from app import helpers
@@ -48,7 +49,7 @@ def _get_custom_lists(request, target_user):
         )
 
     if not target_user.is_public:
-        msg = "User not found"
+        msg = _("User not found")
         raise Http404(msg)
 
     return (
@@ -152,7 +153,7 @@ def list_detail(request, username, list_id):
     is_owner = request.user.is_authenticated and request.user == target_user
     can_view = custom_list.user_can_view(request.user) or custom_list.is_public
     if not can_view:
-        msg = "List not found"
+        msg = _("List not found")
         raise Http404(msg)
 
     media_user = target_user
@@ -245,7 +246,11 @@ def list_detail(request, username, list_id):
         "status_choices": MediaStatusChoices.choices,
     }
 
-    if not request.headers.get("HX-Request"):
+    # Additional context for full page render. Soft-navigation body swaps (e.g.
+    # after saving from an edit modal) also need the full page, not the partial.
+    if not request.headers.get("HX-Request") or request.headers.get(
+        "X-Soft-Navigation"
+    ):
         if custom_list.user_can_edit(request.user):
             context["form"] = CustomListForm(instance=custom_list)
         context.update(
@@ -289,7 +294,7 @@ def edit(request):
             form.save()
             logger.info("%s list edited successfully.", custom_list)
     else:
-        messages.error(request, "You do not have permission to edit this list.")
+        messages.error(request, _("You do not have permission to edit this list."))
     return helpers.redirect_back(request)
 
 
@@ -304,7 +309,7 @@ def delete(request):
         logger.info("%s list deleted successfully.", custom_list)
         return redirect("lists", username=request.user.username)
 
-    messages.error(request, "You do not have permission to delete this list.")
+    messages.error(request, _("You do not have permission to delete this list."))
     return helpers.redirect_back(request)
 
 

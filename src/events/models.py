@@ -28,13 +28,57 @@ INACTIVE_TRACKING_STATUSES = [
 class SentinelDatetime:
     """Sentinel time for event without a specific time."""
 
-    YEAR = 9999
-    MONTH = 12
-    DAY = 31
+    MAX_YEAR = 9999
+    MAX_MONTH = 12
+    MAX_DAY = 31
+    MIN_YEAR = 1
+    MIN_MONTH = 1
+    MIN_DAY = 1
     HOUR = 11
     MINUTE = 59
     SECOND = 59
     MICROSECOND = 999999
+
+    @classmethod
+    def max_datetime(cls):
+        """Return the far-future sentinel used for unknown release dates.
+
+        Uses the regular sentinel time of day, not the end of the day:
+        9999-12-31 23:59:59 sits one second short of ``datetime.max``, so
+        converting it to any timezone ahead of UTC raises ``OverflowError``
+        (issue #884). Midday keeps the value in range for offsets up to UTC+12
+        while still sorting after every real release date.
+        """
+        return datetime(
+            cls.MAX_YEAR,
+            cls.MAX_MONTH,
+            cls.MAX_DAY,
+            cls.HOUR,
+            cls.MINUTE,
+            cls.SECOND,
+            cls.MICROSECOND,
+            tzinfo=UTC,
+        )
+
+    @classmethod
+    def min_datetime(cls):
+        """Return the far-past sentinel used for content of unknown age.
+
+        The mirror of ``max_datetime``: ``datetime.min`` sits exactly on the
+        low bound of the datetime range, so converting it to any timezone
+        behind UTC raises ``OverflowError`` (issue #884). Midday keeps the
+        value in range for offsets down to UTC-11.
+        """
+        return datetime(
+            cls.MIN_YEAR,
+            cls.MIN_MONTH,
+            cls.MIN_DAY,
+            cls.HOUR,
+            cls.MINUTE,
+            cls.SECOND,
+            cls.MICROSECOND,
+            tzinfo=UTC,
+        )
 
 
 class EventManager(models.Manager):
@@ -202,7 +246,7 @@ class Event(models.Model):
         if self.content_number:
             return (
                 f"{self.item.__str__()} "
-                f"{config.get_unit(self.item.media_type, short=True)}"
+                f"{config.get_translated_short_unit(self.item.media_type)}"
                 f"{self.content_number}"
             )
 
@@ -214,9 +258,8 @@ class Event(models.Model):
         if self.content_number is None:
             return ""
 
-        return (
-            f"{config.get_unit(self.item.media_type, short=True)}{self.content_number}"
-        )
+        short_unit = config.get_translated_short_unit(self.item.media_type)
+        return f"{short_unit}{self.content_number}"
 
     @property
     def is_sentinel_time(self):
@@ -230,13 +273,5 @@ class Event(models.Model):
 
     @property
     def is_max_datetime(self):
-        """Check if the event datetime is sentinel datetime."""
-        max_hour = 23
-        return (
-            self.datetime.year == SentinelDatetime.YEAR
-            and self.datetime.month == SentinelDatetime.MONTH
-            and self.datetime.day == SentinelDatetime.DAY
-            and self.datetime.hour == max_hour
-            and self.datetime.minute == SentinelDatetime.MINUTE
-            and self.datetime.second == SentinelDatetime.SECOND
-        )
+        """Check if the event datetime is the unknown-release sentinel."""
+        return self.datetime == SentinelDatetime.max_datetime()

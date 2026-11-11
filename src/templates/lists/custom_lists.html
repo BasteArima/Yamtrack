@@ -1,27 +1,28 @@
 {% extends "base.html" %}
 {% load static %}
 {% load app_tags %}
+{% load i18n %}
 
 {% block extra_head %}
   {% if form %}{{ form.media.css }}{% endif %}
 {% endblock extra_head %}
 
 {% block title %}
-  Lists - Yamtrack
+  {% trans "Lists" %} - Yamtrack
 {% endblock title %}
 
 {% block content %}
   <div x-data="{ showModal: false }">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
       <div>
-        <h1 class="text-3xl font-bold mb-2">Lists</h1>
-        <p class="text-gray-400">Organize and share your media lists</p>
+        <h1 class="text-3xl font-bold mb-2">{% trans "Lists" %}</h1>
+        <p class="text-gray-400">{% trans "Organize and share your media lists" %}</p>
       </div>
       {% if request.user.is_authenticated and request.user == target_user %}
         <button @click="showModal = true"
                 class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors cursor-pointer">
           {% include "app/icons/plus.svg" with classes="w-5 h-5 mr-2" %}
-          New List
+          {% trans "New List" %}
         </button>
       {% endif %}
     </div>
@@ -36,7 +37,7 @@
       </form>
 
       <div class="relative flex-1">
-        <input placeholder="Search lists..."
+        <input placeholder="{% trans 'Search lists...' %}"
                class="w-full py-2 pl-10 pr-4 bg-[#39404b] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#4a9eff] appearance-none"
                type="text"
                x-model="query"
@@ -58,8 +59,12 @@
                 @click="open = !open"
                 type="button">
           {% include "app/icons/arrows-up-down.svg" with classes="w-4 h-4" %}
+          {% trans "Last Item Added" as sort_last_item_added_label %}
+          {% trans "Name" as sort_name_label %}
+          {% trans "Newest First" as sort_newest_first_label %}
+          {% trans "Items Count" as sort_items_count_label %}
           <span class="text-sm"
-                x-text="sort === 'last_item_added' ? 'Last Item Added' : (sort === 'name' ? 'Name' : (sort === 'newest_first' ? 'Newest First' : 'Items Count'))"></span>
+            x-text="sort === 'last_item_added' ? '{{ sort_last_item_added_label|escapejs }}' : (sort === 'name' ? '{{ sort_name_label|escapejs }}' : (sort === 'newest_first' ? '{{ sort_newest_first_label|escapejs }}' : '{{ sort_items_count_label|escapejs }}'))"></span>
           {% include "app/icons/chevron-down.svg" with classes="w-4 h-4" %}
         </button>
 
@@ -98,12 +103,12 @@
           <div class="bg-[#39404b] rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
             {% include "app/icons/list-add.svg" with classes="w-8 h-8 text-gray-400" %}
           </div>
-          <h3 class="text-xl font-semibold mb-2">No Lists Created Yet</h3>
-          <p class="text-gray-400 mb-6">Create custom lists to organize your media collection and share with friends.</p>
+          <h3 class="text-xl font-semibold mb-2">{% trans "No Lists Created Yet" %}</h3>
+          <p class="text-gray-400 mb-6">{% trans "Create custom lists to organize your media collection and share with friends." %}</p>
           {% if request.user.is_authenticated and request.user == target_user %}
             <button @click="showModal = true"
                     class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors cursor-pointer">
-              Create Your First List
+              {% trans "Create Your First List" %}
             </button>
           {% endif %}
         </div>
@@ -134,7 +139,7 @@
   {% if request.user != target_user %}
     <ul class="space-y-1 mb-6 {% if request.user.is_authenticated %}border-t border-[#2c3136] pt-4{% endif %}">
       <li>
-        <span class="flex font-bold items-center space-x-3 px-4 py-2 rounded-md transition-colors duration-200 text-sm text-white">{{ target_user.username }}'s Media:</span>
+        <span class="flex font-bold items-center space-x-3 px-4 py-2 rounded-md transition-colors duration-200 text-sm text-white">{% blocktrans with username=target_user.username %}{{ username }}'s Media:{% endblocktrans %}</span>
       </li>
       {% get_sidebar_media_types target_user as sidebar_media_types %}
       {% for item in sidebar_media_types %}
@@ -150,7 +155,7 @@
         <a href="{% url 'lists' target_user.username %}"
            class="flex items-center space-x-3 px-4 py-2 rounded-md transition-colors duration-200 text-sm text-white bg-[#2c3136]">
           {% include "app/icons/folder-plus.svg" with classes="w-5 h-5 text-indigo-400" %}
-          <span>Lists</span>
+          <span>{% trans "Lists" %}</span>
         </a>
       </li>
     </ul>
@@ -184,7 +189,7 @@
             <polyline points="10 17 15 12 10 7"></polyline>
             <line x1="15" x2="3" y1="12" y2="12"></line>
           </svg>
-          Sign In
+          {% trans "Sign In" %}
         </a>
       </div>
     </div>

@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.db.models import Prefetch, Q
+from django.utils.translation import gettext_lazy as _
 
 from app.models import Item
 
@@ -52,7 +53,7 @@ class CustomList(models.Model):
     description = models.TextField(blank=True, default="")
     is_public = models.BooleanField(
         default=True,
-        help_text="Allow anyone to view this list",
+        help_text=_("Allow anyone to view this list"),
     )
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     collaborators = models.ManyToManyField(

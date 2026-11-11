@@ -1,4 +1,5 @@
 {% load app_tags %}
+{% load i18n %}
 
 <tbody>
   <tr>
@@ -21,7 +22,7 @@
                 hx-indicator="#loading-indicator"
                 hx-on:click="this.closest('tbody').remove()"
                 class="rounded-md border border-gray-700 bg-[#2a2f35] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#313842] cursor-pointer">
-          Load all ({{ section.total }})
+          {% blocktrans with total=section.total %}Load all ({{ total }}){% endblocktrans %}
         </button>
       </td>
     </tr>
