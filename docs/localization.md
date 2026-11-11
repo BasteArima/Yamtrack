@@ -6,6 +6,7 @@ Currently configured languages:
 
 - `en` (default)
 - `it-it`
+- `ru` (maintained in this fork, not on Crowdin: `src/locale/ru/LC_MESSAGES/`)
 
 ## Translating Yamtrack
 

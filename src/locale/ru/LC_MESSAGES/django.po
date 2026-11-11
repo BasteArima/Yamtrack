@@ -1,0 +1,2823 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: yamtrack\n"
+"Report-Msgid-Bugs-To: \n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgctxt "tv tracking verb present"
+msgid "watch"
+msgstr "смотреть"
+
+msgctxt "tv tracking verb past"
+msgid "watched"
+msgstr "посмотрели"
+
+msgctxt "season tracking verb present"
+msgid "watch"
+msgstr "смотреть"
+
+msgctxt "season tracking verb past"
+msgid "watched"
+msgstr "посмотрели"
+
+msgctxt "season progress unit short"
+msgid "E"
+msgstr "Э"
+
+msgctxt "season progress unit singular"
+msgid "Episode"
+msgstr "Эпизод"
+
+msgctxt "season progress unit plural"
+msgid "Episodes"
+msgstr "Эпизоды"
+
+msgctxt "episode tracking verb present"
+msgid "watch"
+msgstr "смотреть"
+
+msgctxt "episode tracking verb past"
+msgid "watched"
+msgstr "посмотрели"
+
+msgctxt "movie tracking verb present"
+msgid "watch"
+msgstr "смотреть"
+
+msgctxt "movie tracking verb past"
+msgid "watched"
+msgstr "посмотрели"
+
+msgctxt "anime tracking verb present"
+msgid "watch"
+msgstr "смотреть"
+
+msgctxt "anime tracking verb past"
+msgid "watched"
+msgstr "посмотрели"
+
+msgctxt "anime progress unit short"
+msgid "E"
+msgstr "Э"
+
+msgctxt "anime progress unit singular"
+msgid "Episode"
+msgstr "Эпизод"
+
+msgctxt "anime progress unit plural"
+msgid "Episodes"
+msgstr "Эпизоды"
+
+msgctxt "manga tracking verb present"
+msgid "read"
+msgstr "читать"
+
+msgctxt "manga tracking verb past"
+msgid "read"
+msgstr "прочитали"
+
+msgctxt "manga progress unit short"
+msgid "#"
+msgstr "#"
+
+msgctxt "manga progress unit singular"
+msgid "Chapter"
+msgstr "Глава"
+
+msgctxt "manga progress unit plural"
+msgid "Chapters"
+msgstr "Главы"
+
+msgctxt "game tracking verb present"
+msgid "play"
+msgstr "играть"
+
+msgctxt "game tracking verb past"
+msgid "played"
+msgstr "сыграли"
+
+msgctxt "book tracking verb present"
+msgid "read"
+msgstr "читать"
+
+msgctxt "book tracking verb past"
+msgid "read"
+msgstr "прочитали"
+
+msgctxt "book progress unit short"
+msgid "P"
+msgstr "С"
+
+msgctxt "book progress unit singular"
+msgid "Page"
+msgstr "Страница"
+
+msgctxt "book progress unit plural"
+msgid "Pages"
+msgstr "Страницы"
+
+msgctxt "comic tracking verb present"
+msgid "read"
+msgstr "читать"
+
+msgctxt "comic tracking verb past"
+msgid "read"
+msgstr "прочитали"
+
+msgctxt "comic progress unit short"
+msgid "#"
+msgstr "#"
+
+msgctxt "comic progress unit singular"
+msgid "Issue"
+msgstr "Выпуск"
+
+msgctxt "comic progress unit plural"
+msgid "Issues"
+msgstr "Выпуски"
+
+msgctxt "board game tracking verb present"
+msgid "play"
+msgstr "играть"
+
+msgctxt "board game tracking verb past"
+msgid "played"
+msgstr "сыграли"
+
+msgctxt "board game progress unit short"
+msgid "#"
+msgstr "#"
+
+msgctxt "board game progress unit singular"
+msgid "Play"
+msgstr "Партия"
+
+msgctxt "board game progress unit plural"
+msgid "Plays"
+msgstr "Партии"
+
+msgid "Invalid time format"
+msgstr "Неверный формат времени"
+
+msgid "Minutes must be between 0 and %(max_min)s."
+msgstr "Минуты должны быть от 0 до %(max_min)s."
+
+msgid "Invalid time format. Provide duration in hours (e.g., '5', '1.5'), hours and minutes (e.g., '5:30', '5h 30min'), or just minutes (e.g., '30min')."
+msgstr "Неверный формат времени. Укажите длительность в часах (например, «5», «1.5»), в часах и минутах (например, «5:30», «5h 30min») или только в минутах (например, «30min»)."
+
+msgid "Select"
+msgstr "Выбрать"
+
+msgid "Parent TV Show"
+msgstr "Родительский сериал"
+
+msgid "Parent Season"
+msgstr "Родительский сезон"
+
+msgid "Parent TV show is required for seasons"
+msgstr "Для сезонов требуется родительский сериал"
+
+msgid "Parent season is required for episodes"
+msgstr "Для эпизодов требуется родительский сезон"
+
+msgid "Title is required for this media type"
+msgstr "Для этого типа медиа требуется название"
+
+msgid "Score"
+msgstr "Оценка"
+
+msgid "Progress"
+msgstr "Прогресс"
+
+msgid "Status"
+msgstr "Статус"
+
+msgid "Start date"
+msgstr "Дата начала"
+
+msgid "End date"
+msgstr "Дата окончания"
+
+msgid "Notes"
+msgstr "Заметки"
+
+msgid "Add any notes or comments..."
+msgstr "Добавьте заметки или комментарии..."
+
+msgid "Progress ({unit})"
+msgstr "Прогресс ({unit})"
+
+msgid "Progress (Time Played)"
+msgstr "Прогресс (время игры)"
+
+msgctxt "history"
+msgid "Marked as currently watching"
+msgstr "Отмечено как «смотрю»"
+
+msgctxt "history"
+msgid "Marked as currently reading"
+msgstr "Отмечено как «читаю»"
+
+msgctxt "history"
+msgid "Marked as currently playing"
+msgstr "Отмечено как «играю»"
+
+msgctxt "history"
+msgid "Marked as finished watching"
+msgstr "Отмечено как просмотренное"
+
+msgctxt "history"
+msgid "Marked as finished reading"
+msgstr "Отмечено как прочитанное"
+
+msgctxt "history"
+msgid "Marked as finished playing"
+msgstr "Отмечено как пройденное"
+
+msgctxt "history"
+msgid "Added to watching list"
+msgstr "Добавлено в список просмотра"
+
+msgctxt "history"
+msgid "Added to reading list"
+msgstr "Добавлено в список чтения"
+
+msgctxt "history"
+msgid "Added to playing list"
+msgstr "Добавлено в список игр"
+
+msgctxt "history"
+msgid "Marked as paused watching"
+msgstr "Просмотр приостановлен"
+
+msgctxt "history"
+msgid "Marked as paused reading"
+msgstr "Чтение приостановлено"
+
+msgctxt "history"
+msgid "Marked as paused playing"
+msgstr "Игра приостановлена"
+
+msgctxt "history"
+msgid "Currently watching"
+msgstr "Смотрю"
+
+msgctxt "history"
+msgid "Currently reading"
+msgstr "Читаю"
+
+msgctxt "history"
+msgid "Currently playing"
+msgstr "Играю"
+
+msgctxt "history"
+msgid "Finished watching"
+msgstr "Просмотр завершён"
+
+msgctxt "history"
+msgid "Finished reading"
+msgstr "Чтение завершено"
+
+msgctxt "history"
+msgid "Finished playing"
+msgstr "Игра завершена"
+
+msgctxt "history"
+msgid "Paused watching"
+msgstr "Просмотр на паузе"
+
+msgctxt "history"
+msgid "Paused reading"
+msgstr "Чтение на паузе"
+
+msgctxt "history"
+msgid "Paused playing"
+msgstr "Игра на паузе"
+
+msgctxt "history"
+msgid "Resumed watching"
+msgstr "Просмотр возобновлён"
+
+msgctxt "history"
+msgid "Resumed reading"
+msgstr "Чтение возобновлено"
+
+msgctxt "history"
+msgid "Resumed playing"
+msgstr "Игра возобновлена"
+
+msgctxt "history"
+msgid "Stopped watching"
+msgstr "Просмотр прекращён"
+
+msgctxt "history"
+msgid "Stopped reading"
+msgstr "Чтение прекращено"
+
+msgctxt "history"
+msgid "Stopped playing"
+msgstr "Игра прекращена"
+
+msgctxt "history"
+msgid "Watched up to %(unit)s %(number)s"
+msgstr "Просмотрено до: %(unit)s %(number)s"
+
+msgctxt "history"
+msgid "Read up to %(unit)s %(number)s"
+msgstr "Прочитано до: %(unit)s %(number)s"
+
+msgctxt "history"
+msgid "Played up to %(unit)s %(number)s"
+msgstr "Сыграно до: %(unit)s %(number)s"
+
+msgid "Today"
+msgstr "Сегодня"
+
+msgid "Yesterday"
+msgstr "Вчера"
+
+msgctxt "history"
+msgid "Started on %(date)s"
+msgstr "Начато %(date)s"
+
+msgctxt "history"
+msgid "Finished on %(date)s"
+msgstr "Завершено %(date)s"
+
+msgctxt "history"
+msgid "Marked as dropped"
+msgstr "Отмечено как брошенное"
+
+msgctxt "history"
+msgid "Rated %(score)s/10"
+msgstr "Оценка %(score)s/10"
+
+msgctxt "history"
+msgid "Played for %(time)s"
+msgstr "Сыграно %(time)s"
+
+msgctxt "history"
+msgid "Started without date"
+msgstr "Начато без даты"
+
+msgctxt "history"
+msgid "Finished without date"
+msgstr "Завершено без даты"
+
+msgctxt "history"
+msgid "Added notes"
+msgstr "Добавлены заметки"
+
+msgctxt "history"
+msgid "Set %(field)s to %(value)s"
+msgstr "%(field)s: установлено значение %(value)s"
+
+msgctxt "history"
+msgid "Changed status from %(old)s to %(new)s"
+msgstr "Статус изменён с %(old)s на %(new)s"
+
+msgctxt "history"
+msgid "Changed rating from %(old)s to %(new)s"
+msgstr "Оценка изменена с %(old)s на %(new)s"
+
+msgctxt "history"
+msgid "Added %(time)s of playtime"
+msgstr "Добавлено %(time)s игрового времени"
+
+msgctxt "history"
+msgid "Removed %(time)s of playtime"
+msgstr "Убрано %(time)s игрового времени"
+
+msgctxt "history"
+msgid "Progress set to %(number)s %(unit)s"
+msgstr "Прогресс установлен: %(number)s %(unit)s"
+
+msgctxt "history"
+msgid "Removed start date"
+msgstr "Дата начала удалена"
+
+msgctxt "history"
+msgid "Start date changed to %(date)s"
+msgstr "Дата начала изменена на %(date)s"
+
+msgctxt "history"
+msgid "Removed end date"
+msgstr "Дата окончания удалена"
+
+msgctxt "history"
+msgid "Ended on %(date)s"
+msgstr "Окончено %(date)s"
+
+msgctxt "history"
+msgid "End date changed to %(date)s"
+msgstr "Дата окончания изменена на %(date)s"
+
+msgctxt "history"
+msgid "Removed notes"
+msgstr "Заметки удалены"
+
+msgctxt "history"
+msgid "Updated notes"
+msgstr "Заметки обновлены"
+
+msgctxt "history"
+msgid "Updated %(field)s from %(old)s to %(new)s"
+msgstr "%(field)s: изменено с %(old)s на %(new)s"
+
+msgid "Manual"
+msgstr "Вручную"
+
+msgid "TV Show"
+msgstr "Сериал"
+
+msgid "TV Season"
+msgstr "Сезон сериала"
+
+msgid "Episode"
+msgstr "Эпизод"
+
+msgid "Movie"
+msgstr "Фильм"
+
+msgid "Anime"
+msgstr "Аниме"
+
+msgid "Manga"
+msgstr "Манга"
+
+msgid "Game"
+msgstr "Игра"
+
+msgid "Book"
+msgstr "Книга"
+
+msgid "Comic"
+msgstr "Комикс"
+
+msgid "Boardgame"
+msgstr "Настольная игра"
+
+msgid "Completed"
+msgstr "Завершено"
+
+msgid "In Progress"
+msgstr "В процессе"
+
+msgid "Planning"
+msgstr "В планах"
+
+msgid "Paused"
+msgstr "На паузе"
+
+msgid "Dropped"
+msgstr "Брошено"
+
+msgid "Success"
+msgstr "Успех"
+
+msgid "Warning"
+msgstr "Предупреждение"
+
+msgid "Error"
+msgstr "Ошибка"
+
+msgid "Info"
+msgstr "Информация"
+
+msgid "%(title)s had %(count)d released episode marked as watched automatically."
+msgid_plural "%(title)s had %(count)d released episodes marked as watched automatically."
+msgstr[0] "У «%(title)s» %(count)d вышедший эпизод автоматически отмечен как просмотренный."
+msgstr[1] "У «%(title)s» %(count)d вышедших эпизода автоматически отмечены как просмотренные."
+msgstr[2] "У «%(title)s» %(count)d вышедших эпизодов автоматически отмечены как просмотренные."
+
+msgid "%(title)s was left in progress because unreleased episodes or seasons remain."
+msgstr "«%(title)s» оставлен в процессе, так как остались невышедшие эпизоды или сезоны."
+
+msgid "%(title)s Season %(season_number)s was marked as in progress automatically."
+msgstr "«%(title)s», сезон %(season_number)s, автоматически отмечен как «в процессе»."
+
+msgid "%(title)s remains in progress because another season is still pending or has not aired yet."
+msgstr "«%(title)s» остаётся в процессе, так как другой сезон ещё не завершён или не вышел."
+
+msgid "%(title)s was marked as completed automatically."
+msgstr "«%(title)s» автоматически отмечен как завершённый."
+
+msgid "%(title)s was left in progress because unreleased episodes remain."
+msgstr "«%(title)s» оставлен в процессе, так как остались невышедшие эпизоды."
+
+msgid "BGG API requires authorization"
+msgstr "API BGG требует авторизации"
+
+msgid "There was an error contacting the %(provider)s API (network error): %(details)s. Check the logs for more details."
+msgstr "Ошибка при обращении к API %(provider)s (сетевая ошибка): %(details)s. Подробности в логах."
+
+msgid "There was an error contacting the %(provider)s API (network error). Check the logs for more details."
+msgstr "Ошибка при обращении к API %(provider)s (сетевая ошибка). Подробности в логах."
+
+msgid "There was an error contacting the %(provider)s API (HTTP %(status_code)s): %(details)s. Check the logs for more details."
+msgstr "Ошибка при обращении к API %(provider)s (HTTP %(status_code)s): %(details)s. Подробности в логах."
+
+msgid "There was an error contacting the %(provider)s API (HTTP %(status_code)s). Check the logs for more details."
+msgstr "Ошибка при обращении к API %(provider)s (HTTP %(status_code)s). Подробности в логах."
+
+msgid "No result found with ID %(media_id)s"
+msgstr "Не найдено результатов с ID %(media_id)s"
+
+msgid "Season %(season_number)s not found for %(provider)s with ID %(media_id)s"
+msgstr "Сезон %(season_number)s не найден у %(provider)s для ID %(media_id)s"
+
+msgid "Episode %(episode_number)s not found in season %(season_number)s for %(provider)s with ID %(media_id)s"
+msgstr "Эпизод %(episode_number)s не найден в сезоне %(season_number)s у %(provider)s для ID %(media_id)s"
+
+msgid "Disabled"
+msgstr "Отключено"
+
+msgctxt "consumption statistic"
+msgid "TV episode watched"
+msgid_plural "TV episodes watched"
+msgstr[0] "Эпизод сериала просмотрен"
+msgstr[1] "Эпизода сериалов просмотрено"
+msgstr[2] "Эпизодов сериалов просмотрено"
+
+msgctxt "consumption statistic"
+msgid "Episode watched"
+msgid_plural "Episodes watched"
+msgstr[0] "Эпизод просмотрен"
+msgstr[1] "Эпизода просмотрено"
+msgstr[2] "Эпизодов просмотрено"
+
+msgctxt "consumption statistic"
+msgid "Movie watched"
+msgid_plural "Movies watched"
+msgstr[0] "Фильм просмотрен"
+msgstr[1] "Фильма просмотрено"
+msgstr[2] "Фильмов просмотрено"
+
+msgctxt "consumption statistic"
+msgid "Anime episode watched"
+msgid_plural "Anime episodes watched"
+msgstr[0] "Эпизод аниме просмотрен"
+msgstr[1] "Эпизода аниме просмотрено"
+msgstr[2] "Эпизодов аниме просмотрено"
+
+msgctxt "consumption statistic"
+msgid "Manga chapter read"
+msgid_plural "Manga chapters read"
+msgstr[0] "Глава манги прочитана"
+msgstr[1] "Главы манги прочитано"
+msgstr[2] "Глав манги прочитано"
+
+msgctxt "consumption statistic"
+msgid "Game hour played"
+msgid_plural "Game hours played"
+msgstr[0] "Час в играх"
+msgstr[1] "Часа в играх"
+msgstr[2] "Часов в играх"
+
+msgctxt "consumption statistic"
+msgid "Book page read"
+msgid_plural "Book pages read"
+msgstr[0] "Страница книг прочитана"
+msgstr[1] "Страницы книг прочитано"
+msgstr[2] "Страниц книг прочитано"
+
+msgctxt "consumption statistic"
+msgid "Comic issue read"
+msgid_plural "Comic issues read"
+msgstr[0] "Выпуск комиксов прочитан"
+msgstr[1] "Выпуска комиксов прочитано"
+msgstr[2] "Выпусков комиксов прочитано"
+
+msgctxt "consumption statistic"
+msgid "Boardgame play"
+msgid_plural "Boardgame plays"
+msgstr[0] "Партия в настолки"
+msgstr[1] "Партии в настолки"
+msgstr[2] "Партий в настолки"
+
+msgctxt "related section"
+msgid "DLCs"
+msgstr "DLC"
+
+msgctxt "related section"
+msgid "Expanded Games"
+msgstr "Расширенные игры"
+
+msgctxt "related section"
+msgid "Expansions"
+msgstr "Дополнения"
+
+msgctxt "related section"
+msgid "Other Editions"
+msgstr "Другие издания"
+
+msgctxt "related section"
+msgid "Parent Game"
+msgstr "Основная игра"
+
+msgctxt "related section"
+msgid "Recommendations"
+msgstr "Рекомендации"
+
+msgctxt "related section"
+msgid "Related Anime"
+msgstr "Связанное аниме"
+
+msgctxt "related section"
+msgid "Related Manga"
+msgstr "Связанная манга"
+
+msgctxt "related section"
+msgid "Remakes"
+msgstr "Ремейки"
+
+msgctxt "related section"
+msgid "Remasters"
+msgstr "Ремастеры"
+
+msgctxt "related section"
+msgid "Seasons"
+msgstr "Сезоны"
+
+msgctxt "related section"
+msgid "Standalone Expansions"
+msgstr "Самостоятельные дополнения"
+
+msgctxt "media detail"
+msgid "Author"
+msgstr "Автор"
+
+msgctxt "media detail"
+msgid "Authors"
+msgstr "Авторы"
+
+msgctxt "media detail"
+msgid "Broadcast"
+msgstr "Трансляция"
+
+msgctxt "media detail"
+msgid "Companies"
+msgstr "Компании"
+
+msgctxt "media detail"
+msgid "Country"
+msgstr "Страна"
+
+msgctxt "media detail"
+msgid "Designers"
+msgstr "Дизайнеры"
+
+msgctxt "media detail"
+msgid "End date"
+msgstr "Дата окончания"
+
+msgctxt "media detail"
+msgid "Episodes"
+msgstr "Эпизоды"
+
+msgctxt "media detail"
+msgid "First air date"
+msgstr "Дата премьеры"
+
+msgctxt "media detail"
+msgid "Format"
+msgstr "Формат"
+
+msgctxt "media detail"
+msgid "ISBN"
+msgstr "ISBN"
+
+msgctxt "media detail"
+msgid "Issues"
+msgstr "Выпуски"
+
+msgctxt "media detail"
+msgid "Languages"
+msgstr "Языки"
+
+msgctxt "media detail"
+msgid "Last air date"
+msgstr "Дата последнего эфира"
+
+msgctxt "media detail"
+msgid "Last issue name"
+msgstr "Название последнего выпуска"
+
+msgctxt "media detail"
+msgid "Last issue number"
+msgstr "Номер последнего выпуска"
+
+msgctxt "media detail"
+msgid "Last updated"
+msgstr "Последнее обновление"
+
+msgctxt "media detail"
+msgid "Latest chapter translated"
+msgstr "Последняя переведённая глава"
+
+msgctxt "media detail"
+msgid "Minimum age"
+msgstr "Минимальный возраст"
+
+msgctxt "media detail"
+msgid "Chapters"
+msgstr "Главы"
+
+msgctxt "media detail"
+msgid "Pages"
+msgstr "Страницы"
+
+msgctxt "media detail"
+msgid "People"
+msgstr "Люди"
+
+msgctxt "media detail"
+msgid "Physical format"
+msgstr "Физический формат"
+
+msgctxt "media detail"
+msgid "Platforms"
+msgstr "Платформы"
+
+msgctxt "media detail"
+msgid "Players"
+msgstr "Игроки"
+
+msgctxt "media detail"
+msgid "Playtime"
+msgstr "Время игры"
+
+msgctxt "media detail"
+msgid "Publish date"
+msgstr "Дата публикации"
+
+msgctxt "media detail"
+msgid "Publisher"
+msgstr "Издатель"
+
+msgctxt "media detail"
+msgid "Publishers"
+msgstr "Издатели"
+
+msgctxt "media detail"
+msgid "Release date"
+msgstr "Дата выхода"
+
+msgctxt "media detail"
+msgid "Runtime"
+msgstr "Длительность"
+
+msgctxt "media detail"
+msgid "Season"
+msgstr "Сезон"
+
+msgctxt "media detail"
+msgid "Seasons"
+msgstr "Сезоны"
+
+msgctxt "media detail"
+msgid "Source"
+msgstr "Первоисточник"
+
+msgctxt "media detail"
+msgid "Start date"
+msgstr "Дата начала"
+
+msgctxt "media detail"
+msgid "Status"
+msgstr "Статус"
+
+msgctxt "media detail"
+msgid "Status in country of origin"
+msgstr "Статус в стране производства"
+
+msgctxt "media detail"
+msgid "Studios"
+msgstr "Студии"
+
+msgctxt "media detail"
+msgid "Themes"
+msgstr "Темы"
+
+msgctxt "media detail"
+msgid "Total runtime"
+msgstr "Общая длительность"
+
+msgctxt "media detail"
+msgid "Year"
+msgstr "Год"
+
+msgctxt "media type plural label"
+msgid "TV Shows"
+msgstr "Сериалы"
+
+msgctxt "media type plural label"
+msgid "TV Seasons"
+msgstr "Сезоны сериалов"
+
+msgctxt "media type plural label"
+msgid "Episodes"
+msgstr "Эпизоды"
+
+msgctxt "media type plural label"
+msgid "Movies"
+msgstr "Фильмы"
+
+msgctxt "media type plural label"
+msgid "Anime"
+msgstr "Аниме"
+
+msgctxt "media type plural label"
+msgid "Manga"
+msgstr "Манга"
+
+msgctxt "media type plural label"
+msgid "Games"
+msgstr "Игры"
+
+msgctxt "media type plural label"
+msgid "Books"
+msgstr "Книги"
+
+msgctxt "media type plural label"
+msgid "Comics"
+msgstr "Комиксы"
+
+msgctxt "media type plural label"
+msgid "Boardgames"
+msgstr "Настольные игры"
+
+msgctxt "natural day"
+msgid "Today %(time)s"
+msgstr "Сегодня %(time)s"
+
+msgctxt "natural day"
+msgid "Tomorrow %(time)s"
+msgstr "Завтра %(time)s"
+
+msgid "No %(media_type_label)s Tracked Yet"
+msgstr "%(media_type_label)s: пока ничего не отслеживается"
+
+msgid "Start tracking your %(media_type_plural)s to keep a record of what you've %(past_verb)s."
+msgstr "Начните отслеживать %(media_type_plural)s, чтобы вести учёт того, что вы %(past_verb)s."
+
+msgid "Manual items cannot be synced."
+msgstr "Ручные записи нельзя синхронизировать."
+
+msgid "The data was recently synced, please wait a few seconds."
+msgstr "Данные недавно синхронизировались, подождите несколько секунд."
+
+msgid "%(title)s was synced to %(source)s successfully."
+msgstr "«%(title)s» успешно синхронизирован с %(source)s."
+
+msgid "Invalid form data"
+msgstr "Неверные данные формы"
+
+msgid "Season %(season_number)s"
+msgstr "Сезон %(season_number)s"
+
+msgid "Episode %(episode_number)s"
+msgstr "Эпизод %(episode_number)s"
+
+msgid "%(media_name)s already exists in the database."
+msgstr "«%(media_name)s» уже есть в базе данных."
+
+msgid "%(item)s added successfully."
+msgstr "«%(item)s» успешно добавлен."
+
+msgid "Record not found"
+msgstr "Запись не найдена"
+
+msgid "Manual sources are not processed"
+msgstr "Ручные источники не обрабатываются"
+
+msgid "No items to process"
+msgstr "Нет элементов для обработки"
+
+msgid "No users with release notifications enabled"
+msgstr "Нет пользователей с включёнными уведомлениями о релизах"
+
+msgid "🔔 YamTrack: New Releases Available! 🔔"
+msgstr "🔔 YamTrack: доступны новые релизы! 🔔"
+
+msgid "📆 YamTrack: Today's Releases 📆"
+msgstr "📆 YamTrack: релизы сегодня 📆"
+
+msgid "Enjoy your media!"
+msgstr "Приятного просмотра!"
+
+msgid "The task to refresh upcoming releases has been queued."
+msgstr "Задача обновления предстоящих релизов поставлена в очередь."
+
+msgid "Invalid Anilist secret key."
+msgstr "Неверный секретный ключ AniList."
+
+msgid "Invalid AniList access token."
+msgstr "Неверный токен доступа AniList."
+
+msgid "User %(username)s not found."
+msgstr "Пользователь %(username)s не найден."
+
+msgid "User %(username)s is private."
+msgstr "Профиль пользователя %(username)s закрыт."
+
+msgid "Invalid file format. Please upload a CSV file."
+msgstr "Неверный формат файла. Загрузите CSV-файл."
+
+msgid "Error processing entry: %(description)s - %(error)s"
+msgstr "Ошибка обработки записи: %(description)s — %(error)s"
+
+msgid "Error processing entry: %(row)s"
+msgstr "Ошибка обработки записи: %(row)s"
+
+msgid "%(title)s: Couldn't find this book via Title or ISBN13 in %(source)s"
+msgstr "%(title)s: не удалось найти эту книгу по названию или ISBN13 в %(source)s"
+
+msgid "Invalid import time."
+msgstr "Неверное время импорта."
+
+msgid "The same import task is already scheduled."
+msgstr "Такая задача импорта уже запланирована."
+
+msgid "%(source)s import task scheduled."
+msgstr "Задача импорта из %(source)s запланирована."
+
+msgid "%(title)s: Couldn't find a game with this title in %(source)s"
+msgstr "%(title)s: не удалось найти игру с таким названием в %(source)s"
+
+msgid "%(title_list)s: They were matched to the same ID %(media_id)s - none imported"
+msgstr "%(title_list)s: сопоставлены с одним и тем же ID %(media_id)s — ничего не импортировано"
+
+msgid "Invalid or missing IMDB ID for title: %(title)s"
+msgstr "Неверный или отсутствующий IMDB ID для: %(title)s"
+
+msgid "%(title)s: Unsupported title type '%(title_type)s' - skipped"
+msgstr "%(title)s: неподдерживаемый тип «%(title_type)s» — пропущено"
+
+msgid "%(title)s: Unknown title type '%(title_type)s' - skipped"
+msgstr "%(title)s: неизвестный тип «%(title_type)s» — пропущено"
+
+msgid "Couldn't find a match in %(source)s for title: %(title)s"
+msgstr "Не найдено совпадений в %(source)s для: %(title)s"
+
+msgid "%(title_list)s: They were matched to the same TMDB ID %(media_id)s - none imported"
+msgstr "%(title_list)s: сопоставлены с одним и тем же TMDB ID %(media_id)s — ничего не импортировано"
+
+msgid "Multiple users found for %(username)s, please use your user ID. User IDs can be found in the URL when viewing your Kitsu profile."
+msgstr "Найдено несколько пользователей %(username)s, используйте ID пользователя. Его можно найти в URL вашего профиля Kitsu."
+
+msgid "Error processing entry: %(title)s (%(kitsu_id)s) - %(entry)s"
+msgstr "Ошибка обработки записи: %(title)s (%(kitsu_id)s) — %(entry)s"
+
+msgid "Could not import unknown item - missing media data from Kitsu. Relationship: %(relationship)s"
+msgstr "Не удалось импортировать неизвестный элемент — нет данных о медиа от Kitsu. Связь: %(relationship)s"
+
+msgid "%(media_title)s: No valid external ID found."
+msgstr "%(media_title)s: не найден действительный внешний ID."
+
+msgid "Error processing entry: %(content)s"
+msgstr "Ошибка обработки записи: %(content)s"
+
+msgid "Invalid SIMKL secret key."
+msgstr "Неверный секретный ключ SIMKL."
+
+msgid "%(title)s: No TMDB ID found"
+msgstr "%(title)s: TMDB ID не найден"
+
+msgid "%(title)s (%(tmdb_id)s) already present in the import list"
+msgstr "%(title)s (%(tmdb_id)s) уже есть в списке импорта"
+
+msgid "Error processing entry: %(tv)s"
+msgstr "Ошибка обработки записи: %(tv)s"
+
+msgid "%(title)s: not found in %(source)s with ID %(tmdb_id)s."
+msgstr "%(title)s: не найдено в %(source)s с ID %(tmdb_id)s."
+
+msgid "Error processing entry: %(movie)s"
+msgstr "Ошибка обработки записи: %(movie)s"
+
+msgid "%(title)s: No MyAnimeList ID found"
+msgstr "%(title)s: MyAnimeList ID не найден"
+
+msgid "%(title)s (%(mal_id)s) already present in the import list"
+msgstr "%(title)s (%(mal_id)s) уже есть в списке импорта"
+
+msgid "%(title)s: not found in %(source)s with ID %(mal_id)s."
+msgstr "%(title)s: не найдено в %(source)s с ID %(mal_id)s."
+
+msgid "Steam API key not configured in environment variables"
+msgstr "Ключ Steam API не задан в переменных окружения"
+
+msgid "Invalid response from Steam API"
+msgstr "Неверный ответ от Steam API"
+
+msgid "Steam API rate limit exceeded. Please try again later."
+msgstr "Превышен лимит запросов к Steam API. Попробуйте позже."
+
+msgid "Steam profile is private or invalid"
+msgstr "Профиль Steam закрыт или недействителен"
+
+msgid "Bad request to Steam API. Please check the Steam ID."
+msgstr "Неверный запрос к Steam API. Проверьте Steam ID."
+
+msgid "Invalid Steam API key"
+msgstr "Неверный ключ Steam API"
+
+msgid "Steam API error: %(status_code)s"
+msgstr "Ошибка Steam API: %(status_code)s"
+
+msgid "Steam API request failed after all retries"
+msgstr "Запрос к Steam API не удался после всех повторов"
+
+msgid "%(name)s (%(appid)s): Couldn't find a match in %(source)s"
+msgstr "%(name)s (%(appid)s): не найдено совпадений в %(source)s"
+
+msgid "Failed to process Steam game %(name)s (%(appid)s): %(error)s"
+msgstr "Не удалось обработать игру Steam %(name)s (%(appid)s): %(error)s"
+
+msgid "Invalid Trakt secret key."
+msgstr "Неверный секретный ключ Trakt."
+
+msgid "User slug %(username)s not found. User slug can be found in your Trakt profile URL."
+msgstr "Slug пользователя %(username)s не найден. Его можно найти в URL вашего профиля Trakt."
+
+msgid "This account is set to private, use OAuth import instead."
+msgstr "Этот аккаунт закрыт, используйте импорт через OAuth."
+
+msgid "Error processing history entry: %(entry)s"
+msgstr "Ошибка обработки записи истории: %(entry)s"
+
+msgid "%(title)s: No %(source)s ID found."
+msgstr "%(title)s: ID %(source)s не найден."
+
+msgid "%(item_identifier)s: not found in %(source)s with ID %(tmdb_id)s."
+msgstr "%(item_identifier)s: не найдено в %(source)s с ID %(tmdb_id)s."
+
+msgid "Error processing watchlist entry: %(entry)s"
+msgstr "Ошибка обработки записи списка «Смотреть позже»: %(entry)s"
+
+msgid "Error processing rating entry: %(entry)s"
+msgstr "Ошибка обработки оценки: %(entry)s"
+
+msgid "Error processing comment entry: %(entry)s"
+msgstr "Ошибка обработки комментария: %(entry)s"
+
+msgid "The uploaded file is not a valid Trakt export archive."
+msgstr "Загруженный файл не является архивом экспорта Trakt."
+
+msgid "The uncompressed Trakt export archive is too large to import."
+msgstr "Распакованный архив экспорта Trakt слишком велик для импорта."
+
+msgid "The uploaded archive does not contain any Trakt export data. Upload the ZIP file downloaded from the Trakt website."
+msgstr "Загруженный архив не содержит данных экспорта Trakt. Загрузите ZIP-файл, скачанный с сайта Trakt."
+
+msgid "Error processing entry with ID %(media_id)s (%(media_type)s): %(error)s"
+msgstr "Ошибка обработки записи с ID %(media_id)s (%(media_type)s): %(error)s"
+
+msgid "%(title)s (%(media_type)s): %(errors)s"
+msgstr "%(title)s (%(media_type)s): %(errors)s"
+
+msgid "Missing metadata for: %(row)s"
+msgstr "Нет метаданных для: %(row)s"
+
+msgid "No media was imported."
+msgstr "Ничего не импортировано."
+
+msgid "Imported %(media_list)s."
+msgstr "Импортировано: %(media_list)s."
+
+msgid "Invalid or expired Trakt authorization request."
+msgstr "Неверный или просроченный запрос авторизации Trakt."
+
+msgid "Trakt authorization failed."
+msgstr "Авторизация Trakt не удалась."
+
+msgid "The task to import media from Trakt has been queued."
+msgstr "Задача импорта из Trakt поставлена в очередь."
+
+msgid "Trakt username is required."
+msgstr "Требуется имя пользователя Trakt."
+
+msgid "Trakt export zip file is required."
+msgstr "Требуется ZIP-файл экспорта Trakt."
+
+msgid "The task to import media from Trakt export file has been queued."
+msgstr "Задача импорта из файла экспорта Trakt поставлена в очередь."
+
+msgid "The task to import media from Simkl has been queued."
+msgstr "Задача импорта из Simkl поставлена в очередь."
+
+msgid "MyAnimeList username is required."
+msgstr "Требуется имя пользователя MyAnimeList."
+
+msgid "The task to import media from MyAnimeList has been queued."
+msgstr "Задача импорта из MyAnimeList поставлена в очередь."
+
+msgid "AniList username is required."
+msgstr "Требуется имя пользователя AniList."
+
+msgid "AniList import queued."
+msgstr "Импорт из AniList поставлен в очередь."
+
+msgid "Kitsu user ID is required."
+msgstr "Требуется ID пользователя Kitsu."
+
+msgid "The task to import media from Kitsu has been queued."
+msgstr "Задача импорта из Kitsu поставлена в очередь."
+
+msgid "Yamtrack CSV file is required."
+msgstr "Требуется CSV-файл Yamtrack."
+
+msgid "The task to import media from Yamtrack CSV file has been queued."
+msgstr "Задача импорта из CSV-файла Yamtrack поставлена в очередь."
+
+msgid "HowLongToBeat CSV file is required."
+msgstr "Требуется CSV-файл HowLongToBeat."
+
+msgid "The task to import media from HowLongToBeat CSV file has been queued."
+msgstr "Задача импорта из CSV-файла HowLongToBeat поставлена в очередь."
+
+msgid "Steam ID is required."
+msgstr "Требуется Steam ID."
+
+msgid "The task to import media from Steam has been queued."
+msgstr "Задача импорта из Steam поставлена в очередь."
+
+msgid "IMDB CSV file is required."
+msgstr "Требуется CSV-файл IMDB."
+
+msgid "The task to import media from IMDB CSV file has been queued."
+msgstr "Задача импорта из CSV-файла IMDB поставлена в очередь."
+
+msgid "GoodReads CSV file is required."
+msgstr "Требуется CSV-файл GoodReads."
+
+msgid "The task to import media from GoodReads CSV file has been queued."
+msgstr "Задача импорта из CSV-файла GoodReads поставлена в очередь."
+
+msgid "Missing payload"
+msgstr "Отсутствуют данные запроса"
+
+msgid "List not found"
+msgstr "Список не найден"
+
+msgid "You do not have permission to edit this list."
+msgstr "У вас нет прав на редактирование этого списка."
+
+msgid "You do not have permission to delete this list."
+msgstr "У вас нет прав на удаление этого списка."
+
+msgid "Bad Request"
+msgstr "Неверный запрос"
+
+msgid "The server could not understand the request due to invalid syntax or missing parameters."
+msgstr "Сервер не смог обработать запрос из-за неверного синтаксиса или отсутствующих параметров."
+
+msgid "report the issue."
+msgstr "сообщите о проблеме."
+
+msgid "If you believe this was a bug, please %(issue_link)s"
+msgstr "Если вы считаете, что это ошибка, %(issue_link)s"
+
+msgid "Back to Home"
+msgstr "На главную"
+
+msgid "Forbidden"
+msgstr "Доступ запрещён"
+
+msgid "Access Forbidden"
+msgstr "Доступ запрещён"
+
+msgid "You don't have permission to access this resource. Please log in or contact an administrator."
+msgstr "У вас нет прав на доступ к этому ресурсу. Войдите или обратитесь к администратору."
+
+msgid "If you believe this was a bug, please"
+msgstr "Если вы считаете, что это ошибка,"
+
+msgid "Log In"
+msgstr "Войти"
+
+msgid "Using a Reverse Proxy?"
+msgstr "Используете обратный прокси?"
+
+msgid "If you're accessing YamTrack through a reverse proxy, you need to set the %(urls_code)s environment variable to your application URL."
+msgstr "Если вы открываете YamTrack через обратный прокси, задайте в переменной окружения %(urls_code)s URL вашего приложения."
+
+msgid "For example "
+msgstr "Например "
+
+msgid "Page not found"
+msgstr "Страница не найдена"
+
+msgid "Page Not Found"
+msgstr "Страница не найдена"
+
+msgid "The page you are looking for doesn't exist or has been moved."
+msgstr "Страница, которую вы ищете, не существует или была перемещена."
+
+msgid "Server Error"
+msgstr "Ошибка сервера"
+
+msgid "Something Went Wrong"
+msgstr "Что-то пошло не так"
+
+msgid "We're sorry, but there was an error processing your request."
+msgstr "К сожалению, при обработке вашего запроса произошла ошибка."
+
+msgid "Try Again"
+msgstr "Попробовать снова"
+
+msgid "Login"
+msgstr "Вход"
+
+msgid "Sign in to your account"
+msgstr "Войдите в свой аккаунт"
+
+msgid "Sign In"
+msgstr "Войти"
+
+msgid "Need an account?"
+msgstr "Нет аккаунта?"
+
+msgid "Register now"
+msgstr "Зарегистрируйтесь"
+
+msgid "Register"
+msgstr "Регистрация"
+
+msgid "Create your account"
+msgstr "Создайте аккаунт"
+
+msgid "Create Account"
+msgstr "Создать аккаунт"
+
+msgid "Already have an account?"
+msgstr "Уже есть аккаунт?"
+
+msgid "Sign in"
+msgstr "Войти"
+
+msgid "Or continue with"
+msgstr "Или продолжить через"
+
+msgid "Open TMDB page for %(name)s"
+msgstr "Открыть страницу TMDB: %(name)s"
+
+msgid "Activity History"
+msgstr "История активности"
+
+msgid "Instance"
+msgstr "Запись"
+
+msgid "You haven't started tracking it yet."
+msgstr "Вы ещё не начали это отслеживать."
+
+msgid "Update"
+msgstr "Обновить"
+
+msgid "Add"
+msgstr "Добавить"
+
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "Track Episode"
+msgstr "Отметить эпизод"
+
+msgid "Watched once"
+msgstr "Просмотрено один раз"
+
+msgid "Watched %(watch_count)s times"
+msgstr "Просмотрено раз: %(watch_count)s"
+
+msgid "Not watched yet"
+msgstr "Ещё не просмотрено"
+
+msgid "Previous Watches"
+msgstr "Предыдущие просмотры"
+
+msgid "No date provided"
+msgstr "Дата не указана"
+
+msgid "Watch Date"
+msgstr "Дата просмотра"
+
+msgid "Add watched entry with current settings"
+msgstr "Добавить просмотр с текущими настройками"
+
+msgid "Add watch"
+msgstr "Добавить просмотр"
+
+msgid "Fills in the current date and time"
+msgstr "Подставляет текущие дату и время"
+
+msgid "Fill in current time"
+msgstr "Текущее время"
+
+msgid "Fills in the date and time the episode will be finished if started now"
+msgstr "Подставляет дату и время, когда эпизод закончится, если начать сейчас"
+
+msgid "Fill in end time"
+msgstr "Время окончания"
+
+msgid "Fills in the air date of the episode, if available"
+msgstr "Подставляет дату выхода эпизода, если она известна"
+
+msgid "Fill in air date"
+msgstr "Дата выхода"
+
+msgid "Clears the watch date and time"
+msgstr "Очищает дату и время просмотра"
+
+msgid "Fill in no date"
+msgstr "Без даты"
+
+msgid "Add to tracker"
+msgstr "Добавить в трекер"
+
+msgid "Add to custom lists"
+msgstr "Добавить в пользовательские списки"
+
+msgid "View your activity history"
+msgstr "Посмотреть историю активности"
+
+msgid "%(item_count)s item"
+msgid_plural "%(item_count)s items"
+msgstr[0] "%(item_count)s элемент"
+msgstr[1] "%(item_count)s элемента"
+msgstr[2] "%(item_count)s элементов"
+
+msgid "Load all (%(total)s)"
+msgstr "Показать все (%(total)s)"
+
+msgid "Nothing is actively moving right now"
+msgstr "Сейчас ничего не в процессе"
+
+msgid "Your planning shelf is still empty"
+msgstr "Ваш список планов пока пуст"
+
+msgid "Start a title and mark it as in progress to see quick updates and release reminders here."
+msgstr "Начните что-нибудь и отметьте как «в процессе», чтобы видеть здесь быстрые обновления и напоминания о релизах."
+
+msgid "Add a few titles to planning to see them here."
+msgstr "Добавьте несколько тайтлов в планы, чтобы увидеть их здесь."
+
+msgid "Browse media"
+msgstr "Обзор медиа"
+
+msgid "Delete activity"
+msgstr "Удалить активность"
+
+msgid "Delete activity?"
+msgstr "Удалить активность?"
+
+msgid "This removes"
+msgstr "Будет удалено"
+
+msgid "for %(item)s from your history. This can't be undone."
+msgstr "для «%(item)s» из вашей истории. Это действие нельзя отменить."
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "Overview"
+msgstr "Обзор"
+
+msgid "Cast"
+msgstr "Актёры"
+
+msgid "Repeats"
+msgstr "Повторы"
+
+msgid "Episodes"
+msgstr "Эпизоды"
+
+msgid "Streaming"
+msgstr "Где смотреть"
+
+msgid "Time to Beat"
+msgstr "Время прохождения"
+
+msgid "Season %(season_number)s of %(title)s"
+msgstr "Сезон %(season_number)s сериала «%(title)s»"
+
+msgid "%(title)s - Season %(season_number)s"
+msgstr "%(title)s — сезон %(season_number)s"
+
+msgid "No seasons found matching"
+msgstr "Не найдено сезонов по запросу"
+
+msgid "Please try a different search term."
+msgstr "Попробуйте другой запрос."
+
+msgid "No TV shows found matching"
+msgstr "Не найдено сериалов по запросу"
+
+msgid "Create"
+msgstr "Создать"
+
+msgid "Progress (Episodes)"
+msgstr "Прогресс (эпизоды)"
+
+msgid "Progress (Chapters)"
+msgstr "Прогресс (главы)"
+
+msgid "Progress (Play Time)"
+msgstr "Прогресс (время игры)"
+
+msgid "Progress (Pages)"
+msgstr "Прогресс (страницы)"
+
+msgid "Please select a parent TV show from the dropdown"
+msgstr "Выберите родительский сериал из списка"
+
+msgid "Please select a parent Season from the dropdown"
+msgstr "Выберите родительский сезон из списка"
+
+msgid "Create Custom Entry"
+msgstr "Создать свою запись"
+
+msgid "Add a custom media entry to your collection if it's not available in the database."
+msgstr "Добавьте собственную запись в коллекцию, если её нет в базе данных."
+
+msgid "Media Type"
+msgstr "Тип медиа"
+
+msgid "Title"
+msgstr "Название"
+
+msgid "Enter title"
+msgstr "Введите название"
+
+msgid "Search for a TV show..."
+msgstr "Поиск сериала..."
+
+msgid "Season Number"
+msgstr "Номер сезона"
+
+msgid "Search for a season..."
+msgstr "Поиск сезона..."
+
+msgid "Episode Number"
+msgstr "Номер эпизода"
+
+msgid "Image URL"
+msgstr "URL изображения"
+
+msgid "Enter image URL"
+msgstr "Введите URL изображения"
+
+msgid "Start Date"
+msgstr "Дата начала"
+
+msgid "End Date"
+msgstr "Дата окончания"
+
+msgid "Create Entry"
+msgstr "Создать запись"
+
+msgid "Home"
+msgstr "Главная"
+
+msgid "Hide unreleased"
+msgstr "Скрыть невышедшее"
+
+msgid "Journal"
+msgstr "Журнал"
+
+msgid "A feed of everything you've done in Yamtrack"
+msgstr "Лента всего, что вы делали в Yamtrack"
+
+msgid "Predefined Ranges"
+msgstr "Готовые периоды"
+
+msgid "Custom Range"
+msgstr "Свой период"
+
+msgid "Apply Range"
+msgstr "Применить период"
+
+msgid "Tracked Activities"
+msgstr "Отслеженные действия"
+
+msgid "Most Active Day"
+msgstr "Самый активный день"
+
+msgid "%(percentage)s%% of activity"
+msgstr "%(percentage)s%% активности"
+
+msgid "Current Streak"
+msgstr "Текущая серия"
+
+msgid "%(days)s day"
+msgid_plural "%(days)s days"
+msgstr[0] "%(days)s день"
+msgstr[1] "%(days)s дня"
+msgstr[2] "%(days)s дней"
+
+msgid "Longest: %(days)s day"
+msgid_plural "Longest: %(days)s days"
+msgstr[0] "Рекорд: %(days)s день"
+msgstr[1] "Рекорд: %(days)s дня"
+msgstr[2] "Рекорд: %(days)s дней"
+
+msgid "%(count)s activity"
+msgid_plural "%(count)s activities"
+msgstr[0] "%(count)s действие"
+msgstr[1] "%(count)s действия"
+msgstr[2] "%(count)s действий"
+
+msgid "Less"
+msgstr "Меньше"
+
+msgid "More"
+msgstr "Больше"
+
+msgid "No tracking activity in this date range."
+msgstr "Нет активности за этот период."
+
+msgid "Unknown"
+msgstr "Неизвестно"
+
+msgid "Show less"
+msgstr "Свернуть"
+
+msgid "Read more"
+msgstr "Читать далее"
+
+msgid "More tracking options"
+msgstr "Другие варианты отслеживания"
+
+msgid "Add new entry"
+msgstr "Добавить новую запись"
+
+msgid "%(count)s Episode"
+msgid_plural "%(count)s Episodes"
+msgstr[0] "%(count)s эпизод"
+msgstr[1] "%(count)s эпизода"
+msgstr[2] "%(count)s эпизодов"
+
+msgid "%(source)s SCORE"
+msgstr "ОЦЕНКА %(source)s"
+
+msgid "%(votes)s vote"
+msgid_plural "%(votes)s votes"
+msgstr[0] "%(votes)s голос"
+msgstr[1] "%(votes)s голоса"
+msgstr[2] "%(votes)s голосов"
+
+msgid "YOUR SCORE"
+msgstr "ВАША ОЦЕНКА"
+
+msgid "Click to edit"
+msgstr "Нажмите, чтобы изменить"
+
+msgid "Your History"
+msgstr "Ваша история"
+
+msgid "Started"
+msgstr "Начато"
+
+msgid "Ended"
+msgstr "Окончено"
+
+msgid "Your notes"
+msgstr "Ваши заметки"
+
+msgid "Actions"
+msgstr "Действия"
+
+msgid "Add to lists"
+msgstr "Добавить в списки"
+
+msgid "Activity history"
+msgstr "История активности"
+
+msgid "Sync metadata with provider"
+msgstr "Синхронизировать метаданные с провайдером"
+
+msgid "Sync metadata"
+msgstr "Синхронизировать метаданные"
+
+msgid "Details"
+msgstr "Подробности"
+
+msgid "Provider"
+msgstr "Провайдер"
+
+msgid "Links"
+msgstr "Ссылки"
+
+msgid "No details available"
+msgstr "Нет подробностей"
+
+msgid "View all"
+msgstr "Показать все"
+
+msgid "%(count)s cast members"
+msgstr "Актёров: %(count)s"
+
+msgid "Repeats (%(repeats)s)"
+msgstr "Повторы (%(repeats)s)"
+
+msgid "Edit entry"
+msgstr "Редактировать запись"
+
+msgid "Finished"
+msgstr "Завершено"
+
+msgid "Unknown air date"
+msgstr "Дата выхода неизвестна"
+
+msgid "Last watched:"
+msgstr "Последний просмотр:"
+
+msgid "preferences"
+msgstr "настройках"
+
+msgid "Watch provider region is not configured. Set a region or disable this feature in %(preferences_link)s."
+msgstr "Регион провайдеров просмотра не настроен. Укажите регион или отключите эту функцию в %(preferences_link)s."
+
+msgid "Main Story"
+msgstr "Основной сюжет"
+
+msgid "Main + Extra"
+msgstr "Сюжет + доп."
+
+msgid "Completionist"
+msgstr "Полное прохождение"
+
+msgid "Search %(media_type_plural)s in %(target_username)s's list..."
+msgstr "Поиск: %(media_type_plural)s в списке %(target_username)s..."
+
+msgid "Search %(media_type_plural)s in your list..."
+msgstr "Поиск: %(media_type_plural)s в вашем списке..."
+
+msgid "Grid View"
+msgstr "Сетка"
+
+msgid "Table View"
+msgstr "Таблица"
+
+msgid "Browse %(media_type)s"
+msgstr "Обзор: %(media_type)s"
+
+msgid "Last Watched"
+msgstr "Последний просмотр"
+
+msgid "%(username)s's Media:"
+msgstr "Медиа пользователя %(username)s:"
+
+msgid "Search"
+msgstr "Поиск"
+
+msgid "Search Results"
+msgstr "Результаты поиска"
+
+msgid "Source"
+msgstr "Источник"
+
+msgid "List View"
+msgstr "Список"
+
+msgid "Page %(page)s of %(total_pages)s (%(counter)s result)"
+msgid_plural "Page %(page)s of %(total_pages)s (%(counter)s results)"
+msgstr[0] "Страница %(page)s из %(total_pages)s (%(counter)s результат)"
+msgstr[1] "Страница %(page)s из %(total_pages)s (%(counter)s результата)"
+msgstr[2] "Страница %(page)s из %(total_pages)s (%(counter)s результатов)"
+
+msgid "No results found"
+msgstr "Ничего не найдено"
+
+msgid "We couldn't find any matches for"
+msgstr "Не удалось найти совпадений для"
+
+msgid "Try checking your spelling or using different keywords."
+msgstr "Проверьте написание или попробуйте другие ключевые слова."
+
+msgid "Statistics"
+msgstr "Статистика"
+
+msgid "Track your media consumption habits"
+msgstr "Следите за своими привычками потребления медиа"
+
+msgid "Completed Items"
+msgstr "Завершено"
+
+msgid "Average Rating"
+msgstr "Средняя оценка"
+
+msgid "%% Rated"
+msgstr "%% с оценкой"
+
+msgid "Consumption"
+msgstr "Потребление"
+
+msgid "Media Type Distribution"
+msgstr "Распределение по типам медиа"
+
+msgid "No media types to display"
+msgstr "Нет типов медиа для отображения"
+
+msgid "Add different types of media to see their distribution."
+msgstr "Добавьте медиа разных типов, чтобы увидеть их распределение."
+
+msgid "Status Distribution"
+msgstr "Распределение по статусам"
+
+msgid "No status data to display"
+msgstr "Нет данных о статусах"
+
+msgid "Track media items with different statuses to see their distribution."
+msgstr "Отслеживайте медиа с разными статусами, чтобы увидеть их распределение."
+
+msgid "Status Distribution by Media Type"
+msgstr "Распределение статусов по типам медиа"
+
+msgid "No data available"
+msgstr "Нет данных"
+
+msgid "Add media items with different statuses to see their distribution by type."
+msgstr "Добавьте медиа с разными статусами, чтобы увидеть распределение по типам."
+
+msgid "Score Distribution by Media Type"
+msgstr "Распределение оценок по типам медиа"
+
+msgid "No ratings yet"
+msgstr "Оценок пока нет"
+
+msgid "Rate your media items to see score distribution statistics."
+msgstr "Оценивайте медиа, чтобы увидеть статистику распределения оценок."
+
+msgid "Top Rated Media"
+msgstr "Лучшее по оценкам"
+
+msgid "Create Custom"
+msgstr "Своя запись"
+
+msgid "Lists"
+msgstr "Списки"
+
+msgid "Calendar"
+msgstr "Календарь"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "Logout"
+msgstr "Выйти"
+
+msgid "Track upcoming releases from your list."
+msgstr "Следите за предстоящими релизами из вашего списка."
+
+msgid "Fetch New Releases"
+msgstr "Получить новые релизы"
+
+msgid "Export link"
+msgstr "Ссылка для экспорта"
+
+msgid "This link can be used to integrate your calendar into any of your calendar applications."
+msgstr "Эту ссылку можно использовать для подключения календаря к любому календарному приложению."
+
+msgid "%(number)s at %(time)s"
+msgstr "%(number)s в %(time)s"
+
+msgid "You haven't created any lists yet."
+msgstr "Вы ещё не создали ни одного списка."
+
+msgid "Edit List"
+msgstr "Редактировать список"
+
+msgid "Create New List"
+msgstr "Создать новый список"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Create List"
+msgstr "Создать список"
+
+msgid "Remove"
+msgstr "Убрать"
+
+msgid "Organize and share your media lists"
+msgstr "Упорядочивайте медиа в списки и делитесь ими"
+
+msgid "New List"
+msgstr "Новый список"
+
+msgid "Search lists..."
+msgstr "Поиск списков..."
+
+msgid "Last Item Added"
+msgstr "Последнее добавленное"
+
+msgid "Name"
+msgstr "Название"
+
+msgid "Newest First"
+msgstr "Сначала новые"
+
+msgid "Items Count"
+msgstr "Количество элементов"
+
+msgid "No Lists Created Yet"
+msgstr "Списков пока нет"
+
+msgid "Create custom lists to organize your media collection and share with friends."
+msgstr "Создавайте собственные списки, чтобы упорядочить коллекцию и делиться ею с друзьями."
+
+msgid "Create Your First List"
+msgstr "Создать первый список"
+
+msgid "Date Added"
+msgstr "Дата добавления"
+
+msgid "%(counter)s collaborator"
+msgid_plural "%(counter)s collaborators"
+msgstr[0] "%(counter)s участник"
+msgstr[1] "%(counter)s участника"
+msgstr[2] "%(counter)s участников"
+
+msgid "All Types"
+msgstr "Все типы"
+
+msgid "Search in collection..."
+msgstr "Поиск в коллекции..."
+
+msgid "All"
+msgstr "Все"
+
+msgid "No items in this list yet"
+msgstr "В этом списке пока ничего нет"
+
+msgid "Start adding your favorite media to build your collection"
+msgstr "Добавляйте любимые медиа, чтобы собрать коллекцию"
+
+msgid "Browse Media"
+msgstr "Обзор медиа"
+
+msgid "Account Connections"
+msgstr "Связанные аккаунты"
+
+msgid "You can sign in to your account using any of the following third-party accounts"
+msgstr "Вы можете входить в свой аккаунт через любой из следующих сторонних аккаунтов"
+
+msgid "Remove Selected"
+msgstr "Удалить выбранное"
+
+msgid "You currently have no third-party accounts connected to this account."
+msgstr "К этому аккаунту пока не подключены сторонние аккаунты."
+
+msgid "Add a Third-Party Account"
+msgstr "Подключить сторонний аккаунт"
+
+msgid "About"
+msgstr "О программе"
+
+msgid "About Yamtrack"
+msgstr "О Yamtrack"
+
+msgid "Description"
+msgstr "Описание"
+
+msgid "Yamtrack is an open-source media tracker that helps you organize and track your media."
+msgstr "Yamtrack — трекер медиа с открытым исходным кодом, который помогает упорядочивать и отслеживать ваши медиа."
+
+msgid "Source Code"
+msgstr "Исходный код"
+
+msgid "Documentation"
+msgstr "Документация"
+
+msgid "Bug Reports"
+msgstr "Сообщения об ошибках"
+
+msgid "License"
+msgstr "Лицензия"
+
+msgid "Yamtrack is licensed under the"
+msgstr "Yamtrack распространяется по лицензии"
+
+msgid "Attribution"
+msgstr "Благодарности"
+
+msgid "Movie and TV streaming providers from"
+msgstr "Провайдеры фильмов и сериалов от"
+
+msgid "JustWatch"
+msgstr "JustWatch"
+
+msgid "Version"
+msgstr "Версия"
+
+msgid "Account"
+msgstr "Аккаунт"
+
+msgid "Profile Information"
+msgstr "Информация профиля"
+
+msgid "Username"
+msgstr "Имя пользователя"
+
+msgid "Profile visibility"
+msgstr "Видимость профиля"
+
+msgid "Private profile"
+msgstr "Закрытый профиль"
+
+msgid "Hide your profile and media lists from anonymous visitors."
+msgstr "Скрыть профиль и списки медиа от анонимных посетителей."
+
+msgid "Save Changes"
+msgstr "Сохранить изменения"
+
+msgid "Change Password"
+msgstr "Сменить пароль"
+
+msgid "Current Password"
+msgstr "Текущий пароль"
+
+msgid "New Password"
+msgstr "Новый пароль"
+
+msgid "Confirm New Password"
+msgstr "Подтвердите новый пароль"
+
+msgid "Update Password"
+msgstr "Обновить пароль"
+
+msgid "Third-Party Connections"
+msgstr "Сторонние подключения"
+
+msgid "Manage your connected third-party accounts for easier sign-in."
+msgstr "Управляйте подключёнными сторонними аккаунтами для удобного входа."
+
+msgid "Manage Account Connections"
+msgstr "Управление подключениями"
+
+msgid "Advanced"
+msgstr "Дополнительно"
+
+msgid "Clear Search Cache"
+msgstr "Очистить кэш поиска"
+
+msgid "Yamtrack stores your search results in a cache to speed up performance and reduce API calls."
+msgstr "Yamtrack хранит результаты поиска в кэше, чтобы ускорить работу и сократить число запросов к API."
+
+msgid "Normally, these cached results expire automatically after 24 hours."
+msgstr "Обычно кэшированные результаты автоматически устаревают через 24 часа."
+
+msgid "If your search results appear outdated, you can clear the cache manually."
+msgstr "Если результаты поиска кажутся устаревшими, вы можете очистить кэш вручную."
+
+msgid "Your next search may be slightly slower as fresh data is retrieved."
+msgstr "Следующий поиск может быть немного медленнее, пока загружаются свежие данные."
+
+msgid "Configure your account and preferences"
+msgstr "Настройте аккаунт и предпочтения"
+
+msgid "Preferences"
+msgstr "Предпочтения"
+
+msgid "Notifications"
+msgstr "Уведомления"
+
+msgid "Integrations"
+msgstr "Интеграции"
+
+msgid "Import Data"
+msgstr "Импорт данных"
+
+msgid "Export Data"
+msgstr "Экспорт данных"
+
+msgid "Currently Excluded"
+msgstr "Сейчас исключено"
+
+msgid "No media items excluded yet"
+msgstr "Исключённых элементов пока нет"
+
+msgid "Exclude"
+msgstr "Исключить"
+
+msgid "No matching items found"
+msgstr "Совпадений не найдено"
+
+msgid "Export"
+msgstr "Экспорт"
+
+msgid "Back up your data or export it for use with other services."
+msgstr "Создайте резервную копию данных или экспортируйте их для других сервисов."
+
+msgid "Your export will include all your media items."
+msgstr "В экспорт войдут все ваши медиа."
+
+msgid "Export as CSV"
+msgstr "Экспорт в CSV"
+
+msgid "Import"
+msgstr "Импорт"
+
+msgid "Hide failed items"
+msgstr "Скрыть неудачные"
+
+msgid "Show failed items"
+msgstr "Показать неудачные"
+
+msgid "Hide traceback"
+msgstr "Скрыть трассировку"
+
+msgid "Show traceback"
+msgstr "Показать трассировку"
+
+msgid "Import from YamTrack backup"
+msgstr "Импорт из резервной копии YamTrack"
+
+msgid "Import games"
+msgstr "Импорт игр"
+
+msgid "Import movies and TV shows from your ratings"
+msgstr "Импорт фильмов и сериалов из ваших оценок"
+
+msgid "Import from GoodReads backup"
+msgstr "Импорт из резервной копии GoodReads"
+
+msgid "Import TV shows and movies"
+msgstr "Импорт сериалов и фильмов"
+
+msgid "File uploads are not available for periodic imports"
+msgstr "Загрузка файлов недоступна для периодического импорта"
+
+msgid "Import Settings"
+msgstr "Настройки импорта"
+
+msgid "Configure your import preferences."
+msgstr "Настройте параметры импорта."
+
+msgid "Import Frequency"
+msgstr "Частота импорта"
+
+msgid "One Time Import"
+msgstr "Однократный импорт"
+
+msgid "Every Day"
+msgstr "Каждый день"
+
+msgid "Every 2 Days"
+msgstr "Каждые 2 дня"
+
+msgid "Import Time"
+msgstr "Время импорта"
+
+msgid "Import Mode"
+msgstr "Режим импорта"
+
+msgid "Only Sync New Items"
+msgstr "Только новые элементы"
+
+msgid "Sync New Items and Overwrite Existing"
+msgstr "Новые элементы с перезаписью существующих"
+
+msgid "Import Sources"
+msgstr "Источники импорта"
+
+msgid "import configuration guide"
+msgstr "руководство по настройке импорта"
+
+msgid "Some of these require additional configuration, check the %(import_guide_link)s."
+msgstr "Некоторые из них требуют дополнительной настройки, см. %(import_guide_link)s."
+
+msgid "Import method"
+msgstr "Способ импорта"
+
+msgid "Public"
+msgstr "Публичный"
+
+msgid "Private (requires authentication)"
+msgstr "Закрытый (требуется авторизация)"
+
+msgid "Export (requires ZIP file)"
+msgstr "Экспорт (требуется ZIP-файл)"
+
+msgid "Public Trakt username"
+msgstr "Публичное имя пользователя Trakt"
+
+msgid "Connect with Trakt & Import"
+msgstr "Подключить Trakt и импортировать"
+
+msgid "Select ZIP File"
+msgstr "Выбрать ZIP-файл"
+
+msgid "Import TV shows, movies and anime"
+msgstr "Импорт сериалов, фильмов и аниме"
+
+msgid "Connect with Simkl & Import"
+msgstr "Подключить Simkl и импортировать"
+
+msgid "Import anime and manga"
+msgstr "Импорт аниме и манги"
+
+msgid "MAL username"
+msgstr "Имя пользователя MAL"
+
+msgid "Import private profile (requires authentication)"
+msgstr "Импорт закрытого профиля (требуется авторизация)"
+
+msgid "Public AniList username"
+msgstr "Публичное имя пользователя AniList"
+
+msgid "Connect with AniList & Import"
+msgstr "Подключить AniList и импортировать"
+
+msgid "Kitsu user ID"
+msgstr "ID пользователя Kitsu"
+
+msgid "Find it on your Kitsu profile URL:"
+msgstr "Его можно найти в URL профиля Kitsu:"
+
+msgid "View CSV format documentation"
+msgstr "Документация по формату CSV"
+
+msgid "Select CSV File"
+msgstr "Выбрать CSV-файл"
+
+msgid "Import games from your Steam library"
+msgstr "Импорт игр из библиотеки Steam"
+
+msgid "Steam 64-bit ID"
+msgstr "64-битный Steam ID"
+
+msgid "Find it on your Steam account details page under your username."
+msgstr "Его можно найти на странице данных аккаунта Steam под именем пользователя."
+
+msgid "Your profile must be public if the API key you are using is not linked to the steamid you are requesting."
+msgstr "Ваш профиль должен быть публичным, если используемый ключ API не привязан к запрашиваемому steamid."
+
+msgid "Active Periodic Imports"
+msgstr "Активные периодические импорты"
+
+msgid "Automated imports that run on a schedule. These will continue to sync your media until disabled."
+msgstr "Автоматические импорты по расписанию. Они продолжат синхронизировать ваши медиа, пока не будут отключены."
+
+msgid "Mode"
+msgstr "Режим"
+
+msgid "Last Import"
+msgstr "Последний импорт"
+
+msgid "Next Import"
+msgstr "Следующий импорт"
+
+msgid "No periodic imports configured"
+msgstr "Периодические импорты не настроены"
+
+msgid "Set up an import with a daily or 2-day frequency to see it here"
+msgstr "Настройте импорт с частотой раз в день или раз в 2 дня, чтобы увидеть его здесь"
+
+msgid "Import History"
+msgstr "История импорта"
+
+msgid "Showing import activity from the last 7 days."
+msgstr "Показана активность импорта за последние 7 дней."
+
+msgid "Failed"
+msgstr "Ошибка"
+
+msgid "Pending"
+msgstr "Ожидает"
+
+msgid "No imports in the last 7 days"
+msgstr "Не было импортов за последние 7 дней"
+
+msgid "Import your media from any source to see the history here"
+msgstr "Импортируйте медиа из любого источника, чтобы увидеть историю здесь"
+
+msgid "Token"
+msgstr "Токен"
+
+msgid "This token is used to authenticate webhook requests from your media servers."
+msgstr "Этот токен используется для аутентификации webhook-запросов от ваших медиасерверов."
+
+msgid "Copy"
+msgstr "Копировать"
+
+msgid "Regenerating will invalidate the previous token"
+msgstr "Перегенерация сделает прежний токен недействительным"
+
+msgid "Regenerate"
+msgstr "Перегенерировать"
+
+msgid "Media Servers"
+msgstr "Медиасерверы"
+
+msgid "Connect your media servers to automatically track your watching progress."
+msgstr "Подключите медиасерверы, чтобы автоматически отслеживать просмотр."
+
+msgid "Integration services"
+msgstr "Сервисы интеграции"
+
+msgid "Jellyfin"
+msgstr "Jellyfin"
+
+msgid "Plex"
+msgstr "Plex"
+
+msgid "Emby"
+msgstr "Emby"
+
+msgid "Connect Jellyfin to automatically track your watching progress."
+msgstr "Подключите Jellyfin, чтобы автоматически отслеживать просмотр."
+
+msgid "Webhook Events"
+msgstr "События webhook"
+
+msgid "Play and Stop events are always processed. Enable these to sync manual watched changes from the unofficial Webhooks plugin."
+msgstr "События Play и Stop обрабатываются всегда. Включите эти, чтобы синхронизировать ручные изменения статуса просмотра из неофициального плагина Webhooks."
+
+msgid "Process MarkPlayed events"
+msgstr "Обрабатывать события MarkPlayed"
+
+msgid "Mark media as watched when it is manually marked played in Jellyfin."
+msgstr "Отмечать медиа как просмотренное, когда оно вручную отмечено просмотренным в Jellyfin."
+
+msgid "Process MarkUnplayed events"
+msgstr "Обрабатывать события MarkUnplayed"
+
+msgid "Remove watched progress when it is manually marked unplayed in Jellyfin. This event can delete media from Yamtrack."
+msgstr "Удалять прогресс просмотра, когда медиа вручную отмечено непросмотренным в Jellyfin. Это событие может удалять медиа из Yamtrack."
+
+msgid "Official Webhook Plugin"
+msgstr "Официальный плагин Webhook"
+
+msgid "You will need to have TMDB and TVDB as metadata providers in Jellyfin."
+msgstr "В Jellyfin в качестве провайдеров метаданных должны быть TMDB и TVDB."
+
+msgid "Install the Webhook plugin from the 'Jellyfin Stable' repo via your server's Plugin Catalog."
+msgstr "Установите плагин Webhook из репозитория «Jellyfin Stable» через каталог плагинов сервера."
+
+msgid "Restart your server, then configure the plugin:"
+msgstr "Перезапустите сервер, затем настройте плагин:"
+
+msgid "Click on the \"Add Generic Destination\" button to create a new webhook."
+msgstr "Нажмите кнопку «Add Generic Destination», чтобы создать новый webhook."
+
+msgid "Name: Yamtrack"
+msgstr "Name: Yamtrack"
+
+msgid "Notification Type: Playback Start and Playback Stop"
+msgstr "Notification Type: Playback Start и Playback Stop"
+
+msgid "User Filter: Your Jellyfin User"
+msgstr "User Filter: ваш пользователь Jellyfin"
+
+msgid "Finally, under the \"Template\" section, paste the following code."
+msgstr "Наконец, в разделе «Template» вставьте следующий код."
+
+msgid "Unofficial Webhooks Plugin"
+msgstr "Неофициальный плагин Webhooks"
+
+msgid "link"
+msgstr "ссылка"
+
+msgid "Add this repository %(repository_link)s to your \"Plugins Catalog\" in Jellyfin settings."
+msgstr "Добавьте репозиторий %(repository_link)s в «Plugins Catalog» в настройках Jellyfin."
+
+msgid "Unofficial Webhooks plugin"
+msgstr "неофициальный плагин Webhooks"
+
+msgid "From your \"Plugins Catalog\", install the %(plugin_link)s."
+msgstr "Из «Plugins Catalog» установите %(plugin_link)s."
+
+msgid "Payload format:"
+msgstr "Формат данных:"
+
+msgid "Listen to events only for:"
+msgstr "Слушать события только для:"
+
+msgid "Your Jellyfin User"
+msgstr "Ваш пользователь Jellyfin"
+
+msgid "Events:"
+msgstr "События:"
+
+msgid "Connect Plex to automatically track your watching progress."
+msgstr "Подключите Plex, чтобы автоматически отслеживать просмотр."
+
+msgid "Plex Usernames"
+msgstr "Имена пользователей Plex"
+
+msgid "This username (or several, comma separated) will be used to filter which events are sent to your webhook."
+msgstr "Это имя пользователя (или несколько через запятую) используется для фильтрации событий, отправляемых на ваш webhook."
+
+msgid "Setup Instructions"
+msgstr "Инструкция по настройке"
+
+msgid "You will need to have a PlexPass in order to have webhooks enabled"
+msgstr "Для работы webhooks нужен PlexPass"
+
+msgid "Go to Settings > Server > Network and enable Webhooks"
+msgstr "Откройте Settings > Server > Network и включите Webhooks"
+
+msgid "Webhooks"
+msgstr "Webhooks"
+
+msgid "In Plex settings, go to %(plex_webhook_link)s."
+msgstr "В настройках Plex откройте %(plex_webhook_link)s."
+
+msgid "In the Webhooks section, click on \"Add Webhook\" and enter the following URL:"
+msgstr "В разделе Webhooks нажмите «Add Webhook» и введите следующий URL:"
+
+msgid "Connect Emby to automatically track your watching progress."
+msgstr "Подключите Emby, чтобы автоматически отслеживать просмотр."
+
+msgid "In Emby, go to Settings > Notifications"
+msgstr "В Emby откройте Settings > Notifications"
+
+msgid "In the Notifications section, click on \"Add Notification\""
+msgstr "В разделе Notifications нажмите «Add Notification»"
+
+msgid "In the Notification settings:"
+msgstr "В настройках уведомления:"
+
+msgid "Request content type:"
+msgstr "Тип содержимого запроса:"
+
+msgid "Limit user events to:"
+msgstr "Ограничить пользовательские события:"
+
+msgid "Your Emby User"
+msgstr "Ваш пользователь Emby"
+
+msgid "\"Limit library events to\" and \"Limit devices events to\" are optional"
+msgstr "«Limit library events to» и «Limit devices events to» необязательны"
+
+msgid "Configure how you want to receive notifications about your media."
+msgstr "Настройте, как вы хотите получать уведомления о ваших медиа."
+
+msgid "Apprise URLs"
+msgstr "URL Apprise"
+
+msgid "Apprise"
+msgstr "Apprise"
+
+msgid "many platforms"
+msgstr "множество платформ"
+
+msgid "%(apprise_link)s is a notification service that supports %(platforms_link)s including:"
+msgstr "%(apprise_link)s — сервис уведомлений, поддерживающий %(platforms_link)s, в том числе:"
+
+msgid "Discord"
+msgstr "Discord"
+
+msgid "Telegram"
+msgstr "Telegram"
+
+msgid "Slack"
+msgstr "Slack"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Pushover"
+msgstr "Pushover"
+
+msgid "ntfy"
+msgstr "ntfy"
+
+msgid "And many more..."
+msgstr "И многие другие..."
+
+msgid "Enter one URL per line. Example: %(webhook_example)s"
+msgstr "Вводите по одному URL на строку. Пример: %(webhook_example)s"
+
+msgid "Enter each Apprise URL on a separate line to send notifications to multiple services."
+msgstr "Вводите каждый URL Apprise на отдельной строке, чтобы отправлять уведомления в несколько сервисов."
+
+msgid "Notification Settings"
+msgstr "Настройки уведомлений"
+
+msgid "Enable Daily Digest"
+msgstr "Включить ежедневную сводку"
+
+msgid "Receive a single notification each day with all media scheduled to release that day"
+msgstr "Получать одно уведомление в день со всеми медиа, выходящими в этот день"
+
+msgid "Receive notifications for recently released media"
+msgstr "Получать уведомления о недавно вышедших медиа"
+
+msgid "Get notified when new episodes, chapters, or other media are released"
+msgstr "Получать уведомления о выходе новых эпизодов, глав и другого"
+
+msgid "Test Notifications"
+msgstr "Проверить уведомления"
+
+msgid "Save Settings"
+msgstr "Сохранить настройки"
+
+msgid "Excluded Media Items"
+msgstr "Исключённые элементы"
+
+msgid "Exclude specific media items from notifications:"
+msgstr "Исключить отдельные элементы из уведомлений:"
+
+msgid "Search for media to exclude..."
+msgstr "Поиск медиа для исключения..."
+
+msgid "Customize the look and behavior of the application."
+msgstr "Настройте внешний вид и поведение приложения."
+
+msgid "Hide Hover Overlay on Touch Devices"
+msgstr "Скрывать оверлей при наведении на сенсорных устройствах"
+
+msgid "Hide the media card hover overlay with action buttons on touch devices for a cleaner mobile experience. On desktop, the overlay will still appear when you hover your mouse over media cards."
+msgstr "Скрывать оверлей карточки с кнопками действий на сенсорных устройствах для более чистого мобильного интерфейса. На компьютере оверлей по-прежнему появляется при наведении мыши на карточку."
+
+msgid "Obfuscate Unseen Episodes"
+msgstr "Скрывать непросмотренные эпизоды"
+
+msgid "When enabled, unseen episode images and descriptions will be blurred."
+msgstr "Если включено, изображения и описания непросмотренных эпизодов будут размыты."
+
+msgid "Bulk Completion Date"
+msgstr "Дата массового завершения"
+
+msgid "When marking a TV show or season as completed, its episodes will be marked as completed with this date."
+msgstr "При отметке сериала или сезона завершённым его эпизоды будут отмечены завершёнными с этой датой."
+
+msgid "Show progress bar on media items"
+msgstr "Показывать индикатор прогресса на карточках"
+
+msgid "Display a progress bar on media items. Items which don't have max progress will be using a dotted line."
+msgstr "Показывать индикатор прогресса на карточках. У элементов без максимального прогресса будет пунктирная линия."
+
+msgid "Hide completed media in recommendations"
+msgstr "Скрывать завершённое в рекомендациях"
+
+msgid "Hide media you've already completed from the recommendations section on detail pages."
+msgstr "Скрывать уже завершённые вами медиа в разделе рекомендаций на страницах подробностей."
+
+msgid "Hide zero ratings"
+msgstr "Скрывать нулевые оценки"
+
+msgid "Hide the rating badge from media cards when the rating is zero."
+msgstr "Скрывать значок оценки на карточках, если оценка равна нулю."
+
+msgid "Date Format"
+msgstr "Формат даты"
+
+msgid "Choose how dates are displayed throughout the application."
+msgstr "Выберите, как отображаются даты в приложении."
+
+msgid "Time Format"
+msgstr "Формат времени"
+
+msgid "Choose between 12-hour or 24-hour clock display."
+msgstr "Выберите 12- или 24-часовой формат."
+
+msgid "Week Start Day"
+msgstr "Первый день недели"
+
+msgid "Choose which day the week starts on for calendars and statistics."
+msgstr "Выберите, с какого дня начинается неделя в календарях и статистике."
+
+msgid "Watch Provider Region"
+msgstr "Регион провайдеров просмотра"
+
+msgid "Choose the region to show watch providers for. Setting this to disabled will hide the box from the media page."
+msgstr "Выберите регион, для которого показывать провайдеров просмотра. Если отключить, блок будет скрыт со страницы медиа."
+
+msgid "Language"
+msgstr "Язык"
+
+msgid "Select your preferred language for the application interface."
+msgstr "Выберите предпочитаемый язык интерфейса."
+
+msgid "Show adult titles"
+msgstr "Показывать тайтлы для взрослых"
+
+msgid "Show adult titles in searches. Depends on them being enabled by the server."
+msgstr "Показывать тайтлы для взрослых в поиске. Зависит от того, включены ли они на сервере."
+
+msgid "Media Types"
+msgstr "Типы медиа"
+
+msgid "Control which media types are visible throughout the app (sidebar, search, calendar, notifications)."
+msgstr "Управляйте тем, какие типы медиа видны в приложении (боковая панель, поиск, календарь, уведомления)."
+
+msgid "Save Preferences"
+msgstr "Сохранить предпочтения"
+
+msgid "Enter your username"
+msgstr "Введите имя пользователя"
+
+msgid "Enter your password"
+msgstr "Введите пароль"
+
+msgid "Confirm Password"
+msgstr "Подтвердите пароль"
+
+msgid "Confirm your password"
+msgstr "Подтвердите ваш пароль"
+
+msgid "Changing the username is not allowed for the demo account."
+msgstr "Смена имени пользователя недоступна для демо-аккаунта."
+
+msgid "Changing the password is not allowed for the demo account."
+msgstr "Смена пароля недоступна для демо-аккаунта."
+
+msgid "'%(url)s' is not a valid Apprise URL."
+msgstr "«%(url)s» не является действительным URL Apprise."
+
+msgid "Unexpected error occurred while processing the task."
+msgstr "При обработке задачи произошла непредвиденная ошибка."
+
+msgid "This task is currently running."
+msgstr "Эта задача сейчас выполняется."
+
+msgid "This task has been queued and is waiting to run."
+msgstr "Эта задача поставлена в очередь и ожидает запуска."
+
+msgid "Only New Items"
+msgstr "Только новые"
+
+msgid "Overwrite Existing"
+msgstr "С перезаписью"
+
+msgid "Every 2 days"
+msgstr "Каждые 2 дня"
+
+msgid "Cron: %(expr)s"
+msgstr "Cron: %(expr)s"
+
+msgid "Upcoming"
+msgstr "Предстоящие"
+
+msgid "Recent"
+msgstr "Недавние"
+
+msgid "Completion"
+msgstr "Завершённость"
+
+msgid "Episodes Left"
+msgstr "Осталось эпизодов"
+
+msgid "Rating"
+msgstr "Оценка"
+
+msgid "Grid"
+msgstr "Сетка"
+
+msgid "Table"
+msgstr "Таблица"
+
+msgid "List"
+msgstr "Список"
+
+msgid "Current Date"
+msgstr "Текущая дата"
+
+msgid "Release Date"
+msgstr "Дата выхода"
+
+msgid "No Date"
+msgstr "Без даты"
+
+msgid "2026-01-18 (ISO)"
+msgstr "2026-01-18 (ISO)"
+
+msgid "18/01/2026 (EU)"
+msgstr "18/01/2026 (EU)"
+
+msgid "01/18/2026 (US)"
+msgstr "01/18/2026 (US)"
+
+msgid "Jan 18, 2026"
+msgstr "18 янв. 2026"
+
+msgid "18 Jan, 2026"
+msgstr "18 янв., 2026"
+
+msgid "14:30 (24-hour)"
+msgstr "14:30 (24-часовой)"
+
+msgid "2:30 PM (12-hour)"
+msgstr "2:30 PM (12-часовой)"
+
+msgid "Monday"
+msgstr "Понедельник"
+
+msgid "Sunday"
+msgstr "Воскресенье"
+
+msgid "Toggle profile visibility to anonymous users"
+msgstr "Переключить видимость профиля для анонимных пользователей"
+
+msgid "Hide unreleased media from the home page"
+msgstr "Скрывать невышедшие медиа на главной"
+
+msgid "Hide hover overlay on touch devices"
+msgstr "Скрывать оверлей при наведении на сенсорных устройствах"
+
+msgid "Blur unseen episode images and descriptions"
+msgstr "Размывать изображения и описания непросмотренных эпизодов"
+
+msgid "Date to use when bulk-marking media as completed"
+msgstr "Дата при массовой отметке медиа завершёнными"
+
+msgid "Preferred date display format"
+msgstr "Предпочитаемый формат даты"
+
+msgid "Preferred time display format"
+msgstr "Предпочитаемый формат времени"
+
+msgid "First day of the week"
+msgstr "Первый день недели"
+
+msgid "Preferred interface language"
+msgstr "Предпочитаемый язык интерфейса"
+
+msgid "Show progress bar"
+msgstr "Показывать индикатор прогресса"
+
+msgid "Hide zero ratings from media cards"
+msgstr "Скрывать нулевые оценки на карточках"
+
+msgid "Show adult titles in search results"
+msgstr "Показывать тайтлы для взрослых в результатах поиска"
+
+msgid "Region to show watch providers for"
+msgstr "Регион для провайдеров просмотра"
+
+msgid "Apprise URLs for notifications"
+msgstr "URL Apprise для уведомлений"
+
+msgid "Items excluded from notifications"
+msgstr "Элементы, исключённые из уведомлений"
+
+msgid "Receive a daily digest of upcoming releases"
+msgstr "Получать ежедневную сводку предстоящих релизов"
+
+msgid "Token for external integrations"
+msgstr "Токен для внешних интеграций"
+
+msgid "Comma-separated list of Plex usernames for webhook matching"
+msgstr "Список имён пользователей Plex через запятую для сопоставления webhook"
+
+msgid "Process Jellyfin MarkPlayed webhook events"
+msgstr "Обрабатывать события webhook MarkPlayed от Jellyfin"
+
+msgid "Process Jellyfin MarkUnplayed webhook events"
+msgstr "Обрабатывать события webhook MarkUnplayed от Jellyfin"
+
+msgid "Settings updated."
+msgstr "Настройки обновлены."
+
+msgid "Your profile has been updated!"
+msgstr "Ваш профиль обновлён!"
+
+msgid "Your password has been updated!"
+msgstr "Ваш пароль обновлён!"
+
+msgid "Notification settings updated successfully!"
+msgstr "Настройки уведомлений успешно обновлены!"
+
+msgid "No notification URLs configured."
+msgstr "URL для уведомлений не настроены."
+
+msgid "YamTrack Test Notification"
+msgstr "Тестовое уведомление YamTrack"
+
+msgid "This is a test notification from YamTrack. If you're seeing this, your notifications are working correctly!"
+msgstr "Это тестовое уведомление от YamTrack. Если вы его видите, уведомления работают правильно!"
+
+msgid "Test notification sent successfully!"
+msgstr "Тестовое уведомление успешно отправлено!"
+
+msgid "Failed to send test notification."
+msgstr "Не удалось отправить тестовое уведомление."
+
+msgid "This section is view-only for demo accounts."
+msgstr "Этот раздел доступен демо-аккаунтам только для просмотра."
+
+msgid "Import schedule deleted."
+msgstr "Расписание импорта удалено."
+
+msgid "Import schedule not found."
+msgstr "Расписание импорта не найдено."
+
+msgid "Token regenerated successfully."
+msgstr "Токен успешно перегенерирован."
+
+msgid "Plex usernames updated successfully"
+msgstr "Имена пользователей Plex успешно обновлены"
+
+msgid "Jellyfin webhook settings updated successfully"
+msgstr "Настройки webhook Jellyfin успешно обновлены"
+
+msgid "Successfully cleared %(count)d search entry"
+msgid_plural "Successfully cleared %(count)d search entries"
+msgstr[0] "Удалена %(count)d запись поиска"
+msgstr[1] "Удалено %(count)d записи поиска"
+msgstr[2] "Удалено %(count)d записей поиска"
+
+msgid "Manage Screenshots"
+msgstr "Управление скриншотами"
+
+msgid "Manage screenshots"
+msgstr "Управление скриншотами"
+
+msgid "%(counter)s screenshot"
+msgid_plural "%(counter)s screenshots"
+msgstr[0] "%(counter)s скриншот"
+msgstr[1] "%(counter)s скриншота"
+msgstr[2] "%(counter)s скриншотов"
+
+msgid "Drag a screenshot to reorder."
+msgstr "Перетащите скриншот, чтобы изменить порядок."
+
+msgid "Screenshot"
+msgstr "Скриншот"
+
+msgid "Delete screenshot"
+msgstr "Удалить скриншот"
+
+msgid "No screenshots yet. Add some below."
+msgstr "Скриншотов пока нет. Добавьте их ниже."
+
+msgid "Add screenshots"
+msgstr "Добавить скриншоты"
+
+msgid "https://example.com/screenshot.jpg (one URL per line)"
+msgstr "https://example.com/screenshot.jpg (по одному URL на строку)"
+
+msgid "%(counter)s item"
+msgid_plural "%(counter)s items"
+msgstr[0] "%(counter)s элемент"
+msgstr[1] "%(counter)s элемента"
+msgstr[2] "%(counter)s элементов"
+
+msgid "Screenshots"
+msgstr "Скриншоты"
+
+msgid "Covers"
+msgstr "Обложки"
+
+msgid "%(title)s screenshot %(number)s"
+msgstr "%(title)s — скриншот %(number)s"
+
+msgid "%(title)s screenshot"
+msgstr "%(title)s — скриншот"
+
+msgid "Upload image files and/or paste URLs (one per line). You can reorder or add more after creating the entry."
+msgstr "Загрузите файлы изображений и/или вставьте URL (по одному на строку). Порядок можно изменить и добавить ещё после создания записи."
+
+msgid "Public profile"
+msgstr "Публичный профиль"
+
+msgid "Allow anyone to view your profile and media lists."
+msgstr "Разрешить всем просматривать ваш профиль и списки медиа."
+
+msgid "The toggle turns a type on or off entirely; the dropdown limits who else can see it when it is on."
+msgstr "Переключатель полностью включает или выключает тип; выпадающий список ограничивает, кто ещё его видит, когда он включён."
+
+msgid "Visible to everyone"
+msgstr "Видно всем"
+
+msgid "Hidden from guests"
+msgstr "Скрыто от гостей"
+
+msgid "Hidden from other users"
+msgstr "Скрыто от других пользователей"
+
+msgid "Only me"
+msgstr "Только я"
+
+msgid "Allow anyone to view your profile and lists"
+msgstr "Разрешить всем просматривать ваш профиль и списки"
+
+msgid "Allow anyone to view this list"
+msgstr "Разрешить всем просматривать этот список"
+
+msgid "Locally cached poster served from MEDIA_ROOT, if downloaded."
+msgstr "Локально кэшированный постер из MEDIA_ROOT, если скачан."
+
+msgid "Locally stored uploaded screenshot, if any."
+msgstr "Загруженный скриншот, хранящийся локально, если есть."
+
+msgid "Hotlinked external screenshot URL, if any."
+msgstr "URL внешнего скриншота (хотлинк), если есть."
+
+msgid "User not found"
+msgstr "Пользователь не найден"
+
+msgid "User profile is private or not found."
+msgstr "Профиль пользователя закрыт или не найден."
+
+msgid "User doesn't have any media types enabled."
+msgstr "У пользователя не включено ни одного типа медиа."
+
